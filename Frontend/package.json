@@ -1,5 +1,5 @@
 {
-  "name": "unhackable-bank",
+  "name": "governement-ctf",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -11,6 +11,7 @@
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "prettier": "^2.8.4",
+    "prettier-plugin-tailwindcss": "^0.2.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
@@ -18,6 +19,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -40,5 +42,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.2.7"
   }
 }
