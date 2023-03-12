@@ -11,7 +11,7 @@ This application is a fictitious representation of a government website where ci
 # Commit rules:
 
 - Please use conventional commit
-- Use your own branch for your feature, when it's done create a pull request
+- Use your own branch for your feature, in order to do that create a card in the board, next go to issues next create a developpement branch.
 - Rebase your branch as much as possible:
   - Checkout master
   - Pull master
