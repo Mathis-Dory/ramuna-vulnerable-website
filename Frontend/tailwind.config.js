@@ -11,9 +11,9 @@ module.exports = {
         romunia: {
           primary: "#293462",
 
-          secondary: "#D61C4E",
+          primaryLight: "#2e6688",
 
-          accent: "#FEB139",
+          secondary: "#FEB139",
 
           black: "#000000",
 
