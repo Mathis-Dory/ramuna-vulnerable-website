@@ -12,4 +12,10 @@ This application is a fictitious representation of a government website where ci
 
 - Please use conventional commit
 - Use your own branch for your feature, when it's done create a pull request
+- Rebase your branch as much as possible:
+  - Checkout master
+  - Pull master
+  - Checkout your branch
+  - > git rebase master
+  - Sometimes you will need to push force
 - Do not push on master 
