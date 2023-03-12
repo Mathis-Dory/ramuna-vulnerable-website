@@ -1,11 +1,11 @@
-import React, { FC } from 'react';
-
+import React, { FC } from "react";
+import NavigationBar from "../NavigationBar/NavigationBar.lazy";
 
 interface FrontPageProps {}
 
 const FrontPage: FC<FrontPageProps> = () => (
   <div>
-    FrontPage Component
+    <NavigationBar />
   </div>
 );
 
