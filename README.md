@@ -19,3 +19,7 @@ This application is a fictitious representation of a government website where ci
   - > git rebase master
   - Sometimes you will need to push force
 - Do not push on master 
+
+# Tips
+
+- Use prettier plugin for your IDE so your code stay clean.
