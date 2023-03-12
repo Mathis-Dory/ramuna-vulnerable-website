@@ -24,3 +24,4 @@ This application is a fictitious representation of a government website where ci
 
 - Use prettier plugin for your IDE so your code stay clean.
 - Use Conventionnal commit plugin and use it to commit.
+- This project use pnpm instead of npm so install it.
