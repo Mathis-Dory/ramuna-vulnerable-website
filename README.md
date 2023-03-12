@@ -23,3 +23,4 @@ This application is a fictitious representation of a government website where ci
 # Tips
 
 - Use prettier plugin for your IDE so your code stay clean.
+- Use Conventionnal commit plugin and use it to commit.
