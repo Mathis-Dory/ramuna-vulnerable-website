@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../typeorm/user.entity';
+import { User } from '../typeorm';
 import { UsersController } from './controllers/users/users.controller';
 import { UsersService } from './services/users/users.service';
 
