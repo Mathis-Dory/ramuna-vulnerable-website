@@ -4,7 +4,7 @@
 
 This project does not use `npm` or `yarn` to manage dependencies. Instead, it uses `pnpm` to manage dependencies. To install `pnpm`, run the following command:
 
-### `pnpm install`
+### `npm install pnpm -g`
 
 ## Available Scripts
 
