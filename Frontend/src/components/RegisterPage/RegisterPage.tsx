@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import NavigationBar from "../NavigationBar/NavigationBar.lazy";
 import Footer from "../Footer/Footer.lazy";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -18,17 +18,47 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { Alert, AlertTitle } from "@mui/material";
+import { apiRequest } from "../../shared/utils/Axios";
+import { Spinner } from "../../shared/utils/Spinner";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 interface RegisterPageProps {}
-const RegisterPage: FC<RegisterPageProps> = () => {
-  countries.registerLocale(enLocale);
+countries.registerLocale(enLocale);
 
+const validateEmail = (email: string): boolean => {
+  // Email validation logic, can be improved to be more strict.
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+const validatePasswordLength = (password: string): boolean => {
+  // Password validation logic.
+  return password.length >= 8;
+};
+const validatePasswordMatch = (password: string, repeatPassword: string): boolean => {
+  // Password validation logic.
+  return password === repeatPassword;
+};
+
+const RegisterPage: FC<RegisterPageProps> = () => {
   const countryObj = countries.getNames("en", { select: "official" });
   const countryArr = Object.entries(countryObj).map(([key, value]) => {
     return { label: value, value: key };
   });
-  const [sex, setSex] = React.useState("");
-  const [citizenship, setCitizenship] = React.useState("");
+  const history = useNavigate();
+
+  const [isSpinnerOpen, setIsSpinnerOpen] = useState(false);
+  const [sex, setSex] = useState("");
+  const [citizenship, setCitizenship] = useState("");
+  const [alert, setAlert] = useState<{
+    message: string;
+    severity: "error" | "success" | "warning" | "info";
+  } | null>(null);
+  const setErrorMessage = (message: string, severity: "error" | "success" | "warning" | "info") => {
+    setAlert({ message, severity });
+  };
 
   const handleChangeSex = (event: SelectChangeEvent) => {
     setSex(event.target.value as string);
@@ -38,13 +68,79 @@ const RegisterPage: FC<RegisterPageProps> = () => {
     setCitizenship(event.target.value as string);
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    console.log("submit");
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const repeatPassword = formData.get("repeatPassword") as string;
+
+    if (!validateEmail(email)) {
+      setErrorMessage("Please enter a valid email address.", "error");
+
+      return;
+    }
+
+    if (!validatePasswordLength(password)) {
+      setErrorMessage("Password must be at least 8 characters long.", "error");
+      return;
+    }
+
+    if (!validatePasswordMatch(password, repeatPassword)) {
+      setErrorMessage("Passwords do not match.", "error");
+      return;
+    }
+
+    const formDataWithoutRepeatPassword = Array.from(formData.entries())
+      .filter(([name]) => name !== "repeatPassword")
+      .reduce((acc, [name, value]) => ({ ...acc, [name]: value }), {});
+
+    // Submit the form data to the server.
+    setIsSpinnerOpen(true);
+    try {
+      await apiRequest({
+        method: "POST",
+        url: `/users/signUp`,
+        data: formDataWithoutRepeatPassword,
+      });
+      setIsSpinnerOpen(false);
+      toast.success("Registration success!", {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+      history("/");
+    } catch (error) {
+      console.error(error);
+      setIsSpinnerOpen(false);
+      toast.error("Registration failed!", {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    }
   };
 
   return (
     <div>
       <NavigationBar />
+      {alert && (
+        <Alert severity={alert.severity} onClose={() => setAlert(null)}>
+          <AlertTitle>{alert.severity.toUpperCase()}</AlertTitle>
+          {alert.message}
+        </Alert>
+      )}
+
       <Box
         sx={{
           marginTop: 8,
@@ -59,7 +155,7 @@ const RegisterPage: FC<RegisterPageProps> = () => {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-        <form onSubmit={handleSubmit} className="max-w-lg">
+        <form onSubmit={handleSubmit} className="mt-8 max-w-lg">
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -90,6 +186,7 @@ const RegisterPage: FC<RegisterPageProps> = () => {
                   labelId="sexLabel"
                   label="Sex"
                   id="sex"
+                  name="sex"
                   value={sex}
                   fullWidth
                   onChange={handleChangeSex}
@@ -109,12 +206,14 @@ const RegisterPage: FC<RegisterPageProps> = () => {
                   id="citizenship"
                   value={citizenship}
                   fullWidth
+                  name="citizenship"
                   onChange={handleChangeCitizenship}
                 >
-                  {!!countryArr?.length &&
-                    countryArr.map(({ label, value }) => (
-                      <MenuItem value={value}>{label}</MenuItem>
-                    ))}
+                  {countryArr?.map(({ label, value }) => (
+                    <MenuItem key={value} value={value}>
+                      {label}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </Grid>
@@ -157,7 +256,7 @@ const RegisterPage: FC<RegisterPageProps> = () => {
           <Grid container justifyContent="center" className="mb-10 mt-10 h-14">
             <Grid item>
               <Link href="#" variant="body2">
-                Already have an account? Sign in
+                {/* TODO: Add route to signIn page */} Already have an account? Sign in
               </Link>
             </Grid>
           </Grid>
@@ -165,6 +264,7 @@ const RegisterPage: FC<RegisterPageProps> = () => {
       </Box>
 
       <Footer />
+      <Spinner isOpen={isSpinnerOpen} />
     </div>
   );
 };
