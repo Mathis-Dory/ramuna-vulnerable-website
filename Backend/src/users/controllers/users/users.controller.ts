@@ -41,6 +41,11 @@ export class UsersController {
   @UsePipes(ValidationPipe)
   async Signup(@Res() response, @Body() createUserDto: RegisterUserDto) {
     const newUSer = await this.userService.signup(createUserDto);
+    if (!newUSer) {
+      return response.status(HttpStatus.CONFLICT).json({
+        message: 'User already exists',
+      });
+    }
     return response.status(HttpStatus.CREATED).json({
       newUSer,
     });
