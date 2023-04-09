@@ -43,7 +43,7 @@ export class UsersController {
     const newUSer = await this.userService.signup(createUserDto);
     if (!newUSer) {
       return response.status(HttpStatus.CONFLICT).json({
-        message: 'User already exists',
+        message: 'User already exists with this mail',
       });
     }
     return response.status(HttpStatus.CREATED).json({
