@@ -9,13 +9,13 @@ import ContactPage from "./components/ContactPage/ContactPage.lazy";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<FrontPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-      </Routes>
-    </BrowserRouter>
     <div>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<FrontPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+        </Routes>
+      </BrowserRouter>
       <ToastContainer
         position="top-center"
         autoClose={5000}
