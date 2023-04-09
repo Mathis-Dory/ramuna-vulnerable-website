@@ -31,12 +31,6 @@ export class UsersController {
     return this.userService.findUsersById(id);
   }
 
-  @Post('/register')
-  @UsePipes(ValidationPipe)
-  registerUser(@Body() createUserDto: RegisterUserDto) {
-    return this.userService.createUser(createUserDto);
-  }
-
   @Post('/signUp')
   @UsePipes(ValidationPipe)
   async Signup(@Res() response, @Body() createUserDto: RegisterUserDto) {

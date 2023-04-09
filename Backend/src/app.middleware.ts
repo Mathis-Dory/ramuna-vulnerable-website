@@ -7,6 +7,8 @@ import {
 } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { UsersService } from './users/services/users/users.service';
+import { User } from './typeorm';
+import { UserStatus } from './users/user.enums';
 interface UserRequest extends Request {
   user: any;
 }
@@ -40,7 +42,7 @@ export class isAuthenticated implements NestMiddleware {
                 );
                 await this.userService.updateToken(newToken, user);
               } else {
-                this.blacklist(req.ip);
+                await this.blacklist(req.ip, user);
                 throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
               }
             }
@@ -56,6 +58,9 @@ export class isAuthenticated implements NestMiddleware {
           decoded = await this.jwt.verify(token);
           const user = await this.userService.findUsersByEmail(decoded.email);
           if (user) {
+            if (user.status === UserStatus.BANNED) {
+              throw new HttpException('Banned', HttpStatus.FORBIDDEN);
+            }
             req.user = user;
             next();
           } else {
@@ -65,8 +70,8 @@ export class isAuthenticated implements NestMiddleware {
       } else {
         throw new HttpException('No token found', HttpStatus.NOT_FOUND);
       }
-    } catch (error) {
-      throw error;
+    } catch (err) {
+      throw err;
     }
   }
 
@@ -78,7 +83,9 @@ export class isAuthenticated implements NestMiddleware {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  blacklist(ip: string) {
+  async blacklist(ip: string, user: User) {
+    await this.userService.updateUserStatus(UserStatus.BANNED, user);
+    //blacklist Ip logic here
     return;
   }
 }

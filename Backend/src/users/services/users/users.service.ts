@@ -1,21 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/typeorm';
-import { LoginUserDto, RegisterUserDto } from '../../dto/users.dtos';
+import { User } from '../../../typeorm';
+import { LoginUserDto, RegisterUserDto } from '../../../users/dto/users.dtos';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { UserRoles, UserStatus } from '../../../users/user.enums';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
-
-  createUser(createUserDto: RegisterUserDto) {
-    const newUser = this.userRepository.create(createUserDto);
-    return this.userRepository.save(newUser);
-  }
 
   getUsers() {
     return this.userRepository.find();
@@ -33,6 +29,10 @@ export class UsersService {
     await this.userRepository.save({ ...existingUser, token: newToken });
   }
 
+  async updateUserStatus(status: string, existingUser: User) {
+    await this.userRepository.save({ ...existingUser, status });
+  }
+
   async signup(createUserDto: RegisterUserDto): Promise<User | any> {
     const salt = await bcrypt.genSalt();
     const hash = await bcrypt.hash(createUserDto.password, salt);
@@ -43,7 +43,12 @@ export class UsersService {
       return false;
     } else {
       const newUser = this.userRepository.create(createUserDto);
-      return this.userRepository.save({ ...newUser, password: hash });
+      return this.userRepository.save({
+        ...newUser,
+        password: hash,
+        role: UserRoles.USER,
+        status: UserStatus.ACTIVE,
+      });
     }
   }
 
