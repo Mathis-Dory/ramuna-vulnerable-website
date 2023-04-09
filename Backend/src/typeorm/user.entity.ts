@@ -19,9 +19,30 @@ export class User {
   @Column({
     nullable: false,
     default: '',
-    name: 'phoneNumber',
+    name: 'firstName',
   })
-  phoneNumber: string;
+  firstName: string;
+
+  @Column({
+    nullable: false,
+    default: '',
+    name: 'lastName',
+  })
+  lastName: string;
+
+  @Column({
+    nullable: false,
+    default: '',
+    name: 'sex',
+  })
+  sex: string;
+
+  @Column({
+    nullable: false,
+    default: '',
+    name: 'citizenship',
+  })
+  citizenship: string;
 
   @Column({
     nullable: false,
@@ -52,7 +73,7 @@ export class User {
 
   @Column({
     nullable: true,
-    default: '',
+    default: 'user',
     name: 'role',
   })
   role: string;

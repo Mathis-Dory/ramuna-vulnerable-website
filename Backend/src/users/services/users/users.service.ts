@@ -40,10 +40,7 @@ export class UsersService {
       email: createUserDto.email,
     });
     if (existingUser) {
-      return new HttpException(
-        'User already exists with this email address',
-        HttpStatus.NOT_ACCEPTABLE,
-      );
+      return false;
     } else {
       const newUser = this.userRepository.create(createUserDto);
       return this.userRepository.save({ ...newUser, password: hash });

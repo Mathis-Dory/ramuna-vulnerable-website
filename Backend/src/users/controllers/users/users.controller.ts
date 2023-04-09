@@ -21,7 +21,7 @@ export class UsersController {
     private jwtService: JwtService,
   ) {}
 
-  @Get()
+  @Get('/users')
   getUsers() {
     return this.userService.getUsers();
   }
@@ -31,21 +31,26 @@ export class UsersController {
     return this.userService.findUsersById(id);
   }
 
-  @Post('register')
+  @Post('/register')
   @UsePipes(ValidationPipe)
   registerUser(@Body() createUserDto: RegisterUserDto) {
     return this.userService.createUser(createUserDto);
   }
 
-  @Post('/signup')
+  @Post('/signUp')
   @UsePipes(ValidationPipe)
   async Signup(@Res() response, @Body() createUserDto: RegisterUserDto) {
     const newUSer = await this.userService.signup(createUserDto);
+    if (!newUSer) {
+      return response.status(HttpStatus.CONFLICT).json({
+        message: 'User already exists with this mail',
+      });
+    }
     return response.status(HttpStatus.CREATED).json({
       newUSer,
     });
   }
-  @Post('/signin')
+  @Post('/signIn')
   @UsePipes(ValidationPipe)
   async SignIn(@Res() response, @Body() loginUserDto: LoginUserDto) {
     const token = await this.userService.signin(loginUserDto, this.jwtService);
