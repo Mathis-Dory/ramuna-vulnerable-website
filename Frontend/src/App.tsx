@@ -5,9 +5,16 @@ import FrontPage from "./components/FrontPage/FrontPage.lazy";
 import RegisterPageLazy from "./components/RegisterPage/RegisterPage.lazy";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ContactPage from "./components/ContactPage/ContactPage.lazy";
 
 function App() {
   return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<FrontPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+      </Routes>
+    </BrowserRouter>
     <div>
       <ToastContainer
         position="top-center"
