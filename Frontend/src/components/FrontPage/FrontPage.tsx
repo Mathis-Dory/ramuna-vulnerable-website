@@ -9,7 +9,7 @@ interface FrontPageProps {}
 const FrontPage: FC<FrontPageProps> = () => {
   const history = useNavigate();
 
-  const handleButtonClick = () => {
+  const handleRegisterClick = () => {
     history("/register");
   };
 
@@ -35,7 +35,7 @@ const FrontPage: FC<FrontPageProps> = () => {
               in our country, we are exposed to cyber attacks. Please be careful we have hackers
               among us. HAPPY HACKING!
             </p>
-            <button className="btn-primary btn mt-10" onClick={handleButtonClick}>
+            <button className="btn-primary btn mt-10" onClick={handleRegisterClick}>
               Sign up
             </button>
           </div>

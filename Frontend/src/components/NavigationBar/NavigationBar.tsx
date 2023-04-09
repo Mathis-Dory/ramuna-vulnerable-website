@@ -9,6 +9,9 @@ const NavigationBar: FC<NavigationBarProps> = () => {
   const handleFrontpageClick = () => {
     history("/");
   };
+  const handleRegisterClick = () => {
+    history("/register");
+  };
   return (
     <div className="navbar flex h-[6rem] justify-around bg-secondary">
       <div className="flex">
@@ -65,7 +68,10 @@ const NavigationBar: FC<NavigationBarProps> = () => {
         </ul>
       </div>
       <div className="navbar-end max-w-[5rem] md:max-w-[10rem]">
-        <span className="btn-ghost btn max-w-[5rem] text-xs text-primary md:max-w-[10rem] md:text-sm">
+        <span
+          className="btn-ghost btn max-w-[5rem] text-xs text-primary md:max-w-[10rem] md:text-sm"
+          onClick={handleRegisterClick}
+        >
           Sign in / Sign up
         </span>
       </div>

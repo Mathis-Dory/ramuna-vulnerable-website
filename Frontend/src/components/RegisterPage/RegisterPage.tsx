@@ -106,7 +106,7 @@ const RegisterPage: FC<RegisterPageProps> = () => {
       setIsSpinnerOpen(false);
       toast.success("Registration success!", {
         position: "top-center",
-        autoClose: 5000,
+        autoClose: 4000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -115,12 +115,15 @@ const RegisterPage: FC<RegisterPageProps> = () => {
         theme: "colored",
       });
       history("/");
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
       setIsSpinnerOpen(false);
-      toast.error("Registration failed!", {
+      const errorServer =
+        error.response.data.message === "User already exists with this mail"
+          ? "This user already exists, please try a different mail."
+          : "Registration failed !";
+      toast.error(errorServer, {
         position: "top-center",
-        autoClose: 5000,
+        autoClose: 4000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
