@@ -14,6 +14,8 @@ import entities from './typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { isAuthenticated } from './app.middleware';
 import { ScheduleModule } from '@nestjs/schedule';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './common/role.guard';
 
 @Module({
   imports: [
@@ -48,7 +50,12 @@ import { ScheduleModule } from '@nestjs/schedule';
     }),
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

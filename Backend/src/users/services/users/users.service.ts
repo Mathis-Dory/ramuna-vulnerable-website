@@ -59,7 +59,7 @@ export class UsersService {
     if (foundUser) {
       const { password } = foundUser;
       if (await bcrypt.compare(userCredentials.password, password)) {
-        const payload = { email: userCredentials.email };
+        const payload = { email: userCredentials.email, role: foundUser.role };
         const token = jwt.sign(payload, {
           secret: process.env.JWT_SECRET,
           expiresIn: '3h',
