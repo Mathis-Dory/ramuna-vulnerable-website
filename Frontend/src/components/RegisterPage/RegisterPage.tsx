@@ -137,13 +137,6 @@ const RegisterPage: FC<RegisterPageProps> = () => {
   return (
     <div>
       <NavigationBar />
-      {alert && (
-        <Alert severity={alert.severity} onClose={() => setAlert(null)}>
-          <AlertTitle>{alert.severity.toUpperCase()}</AlertTitle>
-          {alert.message}
-        </Alert>
-      )}
-
       <Box
         sx={{
           marginTop: 8,
@@ -152,6 +145,12 @@ const RegisterPage: FC<RegisterPageProps> = () => {
           alignItems: "center",
         }}
       >
+        {alert && (
+          <Alert severity={alert.severity} onClose={() => setAlert(null)}>
+            <AlertTitle>{alert.severity.toUpperCase()}</AlertTitle>
+            {alert.message}
+          </Alert>
+        )}
         <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
           <LockOutlinedIcon />
         </Avatar>
