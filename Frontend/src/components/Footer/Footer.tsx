@@ -1,9 +1,18 @@
 import React, { FC } from "react";
 import { Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 interface FooterProps {}
 
 const Footer: FC<FooterProps> = () => {
+  const history = useNavigate();
+
+  const handleContactClick = () => {
+    history("/contact");
+  };
+  const handleHomeClick = () => {
+    history("/");
+  };
   function Copyright(props: any) {
     return (
       <Typography variant="body2" color="white" align="center" {...props}>
@@ -17,10 +26,14 @@ const Footer: FC<FooterProps> = () => {
     <footer className="footer bg-black p-10 text-base-content">
       <div>
         <span className="footer-title">Quick links</span>
-        <span className="link-hover link">Home</span>
-        <span className="link-hover link">Registration</span>
-        <span className="link-hover link">Contact</span>
-        <span className="link-hover link">Jobs</span>
+        <span className="link-hover link" onClick={handleHomeClick}>
+          Home
+        </span>
+        <span className="link-hover link">News</span>
+        <span className="link-hover link">Citizenship</span>
+        <span className="link-hover link" onClick={handleContactClick}>
+          Contact
+        </span>
       </div>
       <div>
         <span className="footer-title">Social</span>
