@@ -25,6 +25,12 @@ export class UsersService {
     return this.userRepository.findOneBy({ email });
   }
 
+  async getUserIdFromJwt(token: string) {
+    const user = await this.userRepository.findOneBy({ token });
+    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    return user.id;
+  }
+
   async updateToken(newToken: string, existingUser: User) {
     await this.userRepository.save({ ...existingUser, token: newToken });
   }

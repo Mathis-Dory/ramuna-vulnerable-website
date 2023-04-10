@@ -13,6 +13,8 @@ import {
 import { LoginUserDto, RegisterUserDto } from '../../dto/users.dtos';
 import { UsersService } from 'src/users/services/users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { Role } from 'src/common/role.enum';
+import { Roles } from 'src/common/role.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -21,9 +23,16 @@ export class UsersController {
     private jwtService: JwtService,
   ) {}
 
+  @Roles(Role.User)
   @Get('/users')
   getUsers() {
     return this.userService.getUsers();
+  }
+
+  @Roles(Role.Admin)
+  @Get('/users')
+  getUsersAdmin() {
+    // TODO: add logic for get admin
   }
 
   @Get('/:id')

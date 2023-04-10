@@ -78,9 +78,6 @@ export class User {
   })
   role: string;
 
-  @OneToMany(() => Document, (document) => document.user)
-  documents: Document[];
-
   @OneToMany(() => Request, (request) => request.user)
   requests: Request[];
 }
