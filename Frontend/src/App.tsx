@@ -5,6 +5,7 @@ import FrontPageLazy from "./components/FrontPage/FrontPage.lazy";
 import SignUpPageLazy from "./components/SignUpPage/SignUpPage.lazy";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import NewsPageLazy from "./components/NewsPage/NewsPage.lazy";
 import SignInPageLazy from "./components/SignInPage/SignInPage.lazy";
 import ContactPageLazy from "./components/ContactPage/ContactPage.lazy";
 
@@ -17,6 +18,7 @@ function App() {
           <Route path="/contact" element={<ContactPageLazy />} />
           <Route path="/signUp" element={<SignUpPageLazy />} />
           <Route path="/signIn" element={<SignInPageLazy />} />
+            <Route path="/news" element={<NewsPageLazy />} />
         </Routes>
       </BrowserRouter>
       <ToastContainer

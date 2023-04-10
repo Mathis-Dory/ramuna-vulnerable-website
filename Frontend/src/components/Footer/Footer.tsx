@@ -17,7 +17,7 @@ const Footer: FC<FooterProps> = () => {
     return (
       <Typography variant="body2" color="white" align="center" {...props}>
         {"Copyright © "}
-        <span color="inherit">Romunia</span> {new Date().getFullYear()}
+        <span color="inherit">Ramuna</span> {new Date().getFullYear()}
         {"."}
       </Typography>
     );

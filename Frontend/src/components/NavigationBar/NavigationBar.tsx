@@ -24,11 +24,14 @@ const NavigationBar: FC<NavigationBarProps> = () => {
   const handleContactClick = () => {
     history("/contact");
   };
+  const handleNewsClick = () => {
+    history("/news");
+  };
   return (
     <div className="navbar flex h-[6rem] justify-around bg-secondary">
       <div className="flex">
         <span className="max-w-[5rem] text-xs normal-case text-primary md:max-w-[10rem]  md:text-lg">
-          Romunia Government
+          Ramuna Government
         </span>
         <img src={Flag} alt="Flag" className="hidden h-14 md:block" />
       </div>
@@ -57,6 +60,9 @@ const NavigationBar: FC<NavigationBarProps> = () => {
             <li onClick={handleFrontpageClick}>
               <span>Homepage</span>
             </li>
+            <li onClick={handleNewsClick}>
+              <span>News</span>
+            </li>
             <li tabIndex={0}>
               <span className="justify-between">Registration</span>
             </li>
@@ -70,6 +76,9 @@ const NavigationBar: FC<NavigationBarProps> = () => {
         <ul className="menu menu-horizontal px-1 text-primary">
           <li onClick={handleFrontpageClick}>
             <span>Home</span>
+          </li>
+          <li onClick={handleNewsClick}>
+            <span>News</span>
           </li>
           <li tabIndex={0}>
             <span>Citizenship registration</span>
