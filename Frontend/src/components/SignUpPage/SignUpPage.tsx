@@ -24,7 +24,7 @@ import { Spinner } from "../../shared/utils/Spinner";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-interface RegisterPageProps {}
+interface SignUpPageProps {}
 countries.registerLocale(enLocale);
 
 const validateEmail = (email: string): boolean => {
@@ -42,7 +42,7 @@ const validatePasswordMatch = (password: string, repeatPassword: string): boolea
   return password === repeatPassword;
 };
 
-const SignUpPage: FC<RegisterPageProps> = () => {
+const SignUpPage: FC<SignUpPageProps> = () => {
   const countryObj = countries.getNames("en", { select: "official" });
   const countryArr = Object.entries(countryObj).map(([key, value]) => {
     return { label: value, value: key };
@@ -66,6 +66,10 @@ const SignUpPage: FC<RegisterPageProps> = () => {
 
   const handleChangeCitizenship = (event: SelectChangeEvent) => {
     setCitizenship(event.target.value as string);
+  };
+
+  const handleSignInClick = () => {
+    history("/signIn");
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -257,8 +261,8 @@ const SignUpPage: FC<RegisterPageProps> = () => {
           </Button>
           <Grid container justifyContent="center" className="mb-10 mt-10 h-14">
             <Grid item>
-              <Link href="#" variant="body2">
-                {/* TODO: Add route to signIn page */} Already have an account? Sign in
+              <Link onClick={handleSignInClick} variant="body2">
+                Already have an account? Sign in
               </Link>
             </Grid>
           </Grid>

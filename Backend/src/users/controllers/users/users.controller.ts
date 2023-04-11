@@ -54,6 +54,11 @@ export class UsersController {
   @UsePipes(ValidationPipe)
   async SignIn(@Res() response, @Body() loginUserDto: LoginUserDto) {
     const token = await this.userService.signin(loginUserDto, this.jwtService);
+    if (!token) {
+      return response.status(HttpStatus.CONFLICT).json({
+        message: 'Incorrect email or password!',
+      });
+    }
     return response.status(HttpStatus.OK).json(token);
   }
 }

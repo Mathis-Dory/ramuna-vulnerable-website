@@ -1,16 +1,24 @@
 import React, { FC } from "react";
 import Flag from "../../shared/images/Flag.svg";
 import { useNavigate } from "react-router-dom";
+import { deleteTokens, isLoggedIn } from "../../shared/utils/Login";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { IconButton } from "@mui/material";
 interface NavigationBarProps {}
 
 const NavigationBar: FC<NavigationBarProps> = () => {
   const history = useNavigate();
 
+  const handleLogoutClick = () => {
+    deleteTokens();
+    history("/");
+  };
+
   const handleFrontpageClick = () => {
     history("/");
   };
-  const handleRegisterClick = () => {
-    history("/register");
+  const handleSignUpClick = () => {
+    history("/signUp");
   };
 
   const handleContactClick = () => {
@@ -72,12 +80,30 @@ const NavigationBar: FC<NavigationBarProps> = () => {
         </ul>
       </div>
       <div className="navbar-end max-w-[5rem] md:max-w-[10rem]">
-        <span
-          className="btn-ghost btn max-w-[5rem] text-xs text-primary md:max-w-[10rem] md:text-sm"
-          onClick={handleRegisterClick}
-        >
-          Sign in / Sign up
-        </span>
+        {isLoggedIn() ? (
+          <>
+            <div className="flex gap-6">
+              <span className="text-primary md:text-sm">
+                Welcome {localStorage.getItem("userName")}
+              </span>
+              <IconButton
+                color="primary"
+                aria-label="Logout"
+                component="label"
+                onClick={handleLogoutClick}
+              >
+                <LogoutIcon />
+              </IconButton>
+            </div>
+          </>
+        ) : (
+          <span
+            className="btn-ghost btn max-w-[5rem] text-xs text-primary md:max-w-[10rem] md:text-sm"
+            onClick={handleSignUpClick}
+          >
+            Sign in / Sign up
+          </span>
+        )}
       </div>
     </div>
   );

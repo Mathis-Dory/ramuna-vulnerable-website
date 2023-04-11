@@ -1,11 +1,11 @@
 import React, { lazy, Suspense } from "react";
 
-const LazyRegisterPage = lazy(() => import("./SignUpPage"));
+const LazySignUpPage = lazy(() => import("./SignUpPage"));
 
-const RegisterPage = (props: JSX.IntrinsicAttributes & { children?: React.ReactNode }) => (
+const SignUpPage = (props: JSX.IntrinsicAttributes & { children?: React.ReactNode }) => (
   <Suspense fallback={null}>
-    <LazyRegisterPage {...props} />
+    <LazySignUpPage {...props} />
   </Suspense>
 );
 
-export default RegisterPage;
+export default SignUpPage;
