@@ -42,7 +42,7 @@ const validatePasswordMatch = (password: string, repeatPassword: string): boolea
   return password === repeatPassword;
 };
 
-const RegisterPage: FC<RegisterPageProps> = () => {
+const SignUpPage: FC<RegisterPageProps> = () => {
   const countryObj = countries.getNames("en", { select: "official" });
   const countryArr = Object.entries(countryObj).map(([key, value]) => {
     return { label: value, value: key };
@@ -271,4 +271,4 @@ const RegisterPage: FC<RegisterPageProps> = () => {
   );
 };
 
-export default RegisterPage;
+export default SignUpPage;

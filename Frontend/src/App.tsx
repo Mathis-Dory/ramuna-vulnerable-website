@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import FrontPageLazy from "./components/FrontPage/FrontPage.lazy";
-import RegisterPageLazy from "./components/RegisterPage/RegisterPage.lazy";
+import RegisterPageLazy from "./components/SignUpPage/SignUpPage.lazy";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ContactPageLazy from "./components/ContactPage/ContactPage.lazy";
