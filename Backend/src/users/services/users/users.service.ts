@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/typeorm';
 import { LoginUserDto, RegisterUserDto } from '../../dto/users.dtos';
@@ -60,18 +60,16 @@ export class UsersService {
           expiresIn: '3h',
         });
         await this.updateToken(token, foundUser);
+        const userId = foundUser.id;
+        const userName = foundUser.firstName;
         return {
           token,
+          userId,
+          userName,
         };
       }
-      return new HttpException(
-        'Incorrect username or password',
-        HttpStatus.UNAUTHORIZED,
-      );
+      return false;
     }
-    return new HttpException(
-      'No user matching these credentials was found!',
-      HttpStatus.UNAUTHORIZED,
-    );
+    return false;
   }
 }

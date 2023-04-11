@@ -4,13 +4,14 @@ import NavigationBar from "../NavigationBar/NavigationBar.lazy";
 import Footer from "../Footer/Footer.lazy";
 import Flag from "../../shared/images/Flag.svg";
 import Warning from "../../shared/images/Warning.svg";
+import { isLoggedIn } from "../../shared/utils/Login";
 interface FrontPageProps {}
 
 const FrontPage: FC<FrontPageProps> = () => {
   const history = useNavigate();
 
-  const handleRegisterClick = () => {
-    history("/register");
+  const handleSignUpClick = () => {
+    history("/signUp");
   };
 
   return (
@@ -35,9 +36,13 @@ const FrontPage: FC<FrontPageProps> = () => {
               in our country, we are exposed to cyber attacks. Please be careful we have hackers
               among us. HAPPY HACKING!
             </p>
-            <button className="btn-primary btn mt-10" onClick={handleRegisterClick}>
-              Sign up
-            </button>
+            {isLoggedIn() ? (
+              <></>
+            ) : (
+              <button className="btn-primary btn mt-10" onClick={handleSignUpClick}>
+                Sign up
+              </button>
+            )}
           </div>
         </div>
       </div>
