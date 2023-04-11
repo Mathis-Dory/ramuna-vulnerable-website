@@ -12,6 +12,10 @@ const NavigationBar: FC<NavigationBarProps> = () => {
   const handleRegisterClick = () => {
     history("/register");
   };
+
+  const handleContactClick = () => {
+    history("/contact");
+  };
   return (
     <div className="navbar flex h-[6rem] justify-around bg-secondary">
       <div className="flex">
@@ -48,7 +52,7 @@ const NavigationBar: FC<NavigationBarProps> = () => {
             <li tabIndex={0}>
               <span className="justify-between">Registration</span>
             </li>
-            <li>
+            <li onClick={handleContactClick}>
               <span>Contact</span>
             </li>
           </ul>
@@ -62,7 +66,7 @@ const NavigationBar: FC<NavigationBarProps> = () => {
           <li tabIndex={0}>
             <span>Citizenship registration</span>
           </li>
-          <li>
+          <li onClick={handleContactClick}>
             <span>Contact</span>
           </li>
         </ul>
