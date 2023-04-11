@@ -15,8 +15,8 @@ function App() {
         <Routes>
           <Route path="/" element={<FrontPageLazy />} />
           <Route path="/contact" element={<ContactPageLazy />} />
-            <Route path="/signUp" element={<SignUpPageLazy />} />
-            <Route path="/signIn" element={<SignInPageLazy />} />
+          <Route path="/signUp" element={<SignUpPageLazy />} />
+          <Route path="/signIn" element={<SignInPageLazy />} />
         </Routes>
       </BrowserRouter>
       <ToastContainer
