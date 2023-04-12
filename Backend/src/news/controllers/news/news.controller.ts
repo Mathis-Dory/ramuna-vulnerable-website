@@ -15,7 +15,7 @@ import {
 import { NewsService } from '../../../news/services/news/news.service';
 import { Roles } from '../../../common/role.decorator';
 import { Role } from '../../../common/role.enum';
-import { NewsDto } from '../../../news/dto/news.dtos';
+import { NewsDto, UpdateNewsDto } from '../../../news/dto/news.dtos';
 
 @Controller('news')
 export class NewsController {
@@ -53,7 +53,7 @@ export class NewsController {
   async editNews(
     @Res() response,
     @Param('id') id,
-    @Body() editNewsDto: NewsDto,
+    @Body() editNewsDto: UpdateNewsDto,
   ) {
     const existingNews = await this.newsService.findNewsById(id);
     if (!existingNews) {

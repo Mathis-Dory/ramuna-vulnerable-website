@@ -28,6 +28,9 @@ export class News {
   })
   body: string;
 
+  @Column('bytea', { nullable: true })
+  binaryData: Buffer;
+
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',

@@ -6,4 +6,13 @@ export class NewsDto {
 
   @IsNotEmpty()
   body: string;
+
+  @IsNotEmpty()
+  binaryData?: string;
+}
+
+export class UpdateNewsDto {
+  title?: string;
+  body?: string;
+  binaryData?: string;
 }

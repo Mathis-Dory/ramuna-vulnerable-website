@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { News } from '../../../typeorm';
-import { NewsDto } from '../../../news/dto/news.dtos';
+import { NewsDto, UpdateNewsDto } from '../../../news/dto/news.dtos';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -40,19 +40,35 @@ export class NewsService {
   }
 
   async postNews(news: NewsDto) {
-    const newNews = this.newsRepository.create(news);
-    return this.newsRepository.save(newNews);
+    const newNews = this.newsRepository.create({
+      ...news,
+      binaryData: Buffer.from(news.binaryData, 'base64'),
+    });
+    return await this.newsRepository.save(newNews);
   }
 
-  async editNews(id: number, news: NewsDto) {
-    let newNews;
-    try {
-      newNews = await this.newsRepository.save({ ...news, id });
-    } catch (error) {
-      throw error;
+  async editNews(id: number, newsDTO: UpdateNewsDto) {
+    const { title, body, binaryData } = newsDTO;
+
+    const news = await this.newsRepository.findOne({ where: { id } });
+
+    if (!news) {
+      throw new Error('News not found');
     }
 
-    return newNews;
+    if (title) {
+      news.title = title;
+    }
+
+    if (body) {
+      news.body = body;
+    }
+
+    if (binaryData) {
+      news.binaryData = Buffer.from(binaryData, 'base64'); // Convert base64 string to Buffer
+    }
+
+    return await this.newsRepository.save(news);
   }
 
   async deleteNews(id: number) {
