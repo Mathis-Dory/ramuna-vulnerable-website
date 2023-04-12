@@ -11,7 +11,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { LoginUserDto, RegisterUserDto } from '../../dto/users.dtos';
-import { UsersService } from '../../../users/services/users/users.service';
+import { UsersService } from '../../services/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '../../../common/role.enum';
 import { Roles } from '../../../common/role.decorator';
@@ -26,12 +26,6 @@ export class UsersController {
   @Get('/users')
   getUsers() {
     return this.userService.getUsers();
-  }
-
-  @Roles(Role.Admin)
-  @Get('/users')
-  getUsersAdmin() {
-    // TODO: add logic for get admin
   }
 
   @Get('/:id')
