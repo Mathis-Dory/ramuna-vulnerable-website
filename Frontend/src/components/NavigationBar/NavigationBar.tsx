@@ -92,7 +92,7 @@ const NavigationBar: FC<NavigationBarProps> = () => {
         {isLoggedIn() ? (
           <>
             <div className="flex gap-6">
-              <span className="text-primary md:text-sm">
+              <span className="flex items-center text-primary md:text-sm">
                 Welcome {localStorage.getItem("userName")}
               </span>
               <IconButton
