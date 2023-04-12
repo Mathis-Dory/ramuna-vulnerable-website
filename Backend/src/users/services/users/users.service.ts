@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/typeorm';
-import { LoginUserDto, RegisterUserDto } from '../../dto/users.dtos';
+import { User } from '../../../typeorm';
+import { LoginUserDto, RegisterUserDto } from '../../../users/dto/users.dtos';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { UserRoles, UserStatus } from '../../../users/user.enums';
 
 @Injectable()
 export class UsersService {
@@ -12,13 +13,12 @@ export class UsersService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  createUser(createUserDto: RegisterUserDto) {
-    const newUser = this.userRepository.create(createUserDto);
-    return this.userRepository.save(newUser);
-  }
-
   getUsers() {
     return this.userRepository.find();
+  }
+
+  async getAdminUsers() {
+    return this.userRepository.find({ where: { role: UserRoles.ADMIN } });
   }
 
   findUsersById(id: number) {
@@ -29,8 +29,20 @@ export class UsersService {
     return this.userRepository.findOneBy({ email });
   }
 
+  async getUserIdFromJwt(token: string) {
+    const user = await this.userRepository.findOneBy({
+      token: token.split('Bearer ')[1],
+    });
+    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    return user.id;
+  }
+
   async updateToken(newToken: string, existingUser: User) {
     await this.userRepository.save({ ...existingUser, token: newToken });
+  }
+
+  async updateUserStatus(status: string, existingUser: User) {
+    await this.userRepository.save({ ...existingUser, status });
   }
 
   async signup(createUserDto: RegisterUserDto): Promise<User | any> {
@@ -43,7 +55,12 @@ export class UsersService {
       return false;
     } else {
       const newUser = this.userRepository.create(createUserDto);
-      return this.userRepository.save({ ...newUser, password: hash });
+      return this.userRepository.save({
+        ...newUser,
+        password: hash,
+        role: UserRoles.USER,
+        status: UserStatus.ACTIVE,
+      });
     }
   }
 
@@ -54,7 +71,7 @@ export class UsersService {
     if (foundUser) {
       const { password } = foundUser;
       if (await bcrypt.compare(userCredentials.password, password)) {
-        const payload = { email: userCredentials.email };
+        const payload = { email: userCredentials.email, role: foundUser.role };
         const token = jwt.sign(payload, {
           secret: process.env.JWT_SECRET,
           expiresIn: '3h',

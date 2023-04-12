@@ -1,6 +1,11 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { User } from './user.entity';
-
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Request } from './request.entity';
 @Entity()
 export class Document {
   @PrimaryGeneratedColumn({
@@ -19,6 +24,13 @@ export class Document {
   @Column({
     nullable: false,
     default: '',
+    name: 'documentType',
+  })
+  documentType: string;
+
+  @Column({
+    nullable: false,
+    default: '',
     name: 'status',
   })
   status: string;
@@ -29,6 +41,13 @@ export class Document {
   })
   rawData: string;
 
-  @ManyToOne(() => User, (user) => user.documents)
-  user: User;
+  @Column({ name: 'requestId' })
+  requestId: number;
+
+  @ManyToOne(() => Request, (request) => request.documents, {
+    nullable: false,
+    eager: true,
+  })
+  @JoinColumn({ name: 'requestId' })
+  request: Request;
 }

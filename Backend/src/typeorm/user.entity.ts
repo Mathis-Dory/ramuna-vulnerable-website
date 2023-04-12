@@ -1,5 +1,4 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Document } from './document.entity';
 import { Request } from './request.entity';
 @Entity()
 export class User {
@@ -77,9 +76,6 @@ export class User {
     name: 'role',
   })
   role: string;
-
-  @OneToMany(() => Document, (document) => document.user)
-  documents: Document[];
 
   @OneToMany(() => Request, (request) => request.user)
   requests: Request[];
