@@ -4,9 +4,8 @@ export class DocumentDto {
   @IsNotEmpty()
   rawData: string;
 
-  @IsNotEmpty()
-  documentType: string;
+  status?: string;
 
   @IsNotEmpty()
-  requestId: number;
+  documentType: string;
 }

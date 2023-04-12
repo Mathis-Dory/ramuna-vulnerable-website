@@ -11,6 +11,7 @@ import { DocumentsService } from '../documents/services/documents/documents.serv
     TypeOrmModule.forFeature([User]),
     TypeOrmModule.forFeature([Document]),
   ],
+  exports: [RequestsService],
   controllers: [RequestsController],
   providers: [UsersService, RequestsService, DocumentsService],
 })

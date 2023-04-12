@@ -12,17 +12,18 @@ import { Repository } from 'typeorm';
 export class DocumentsService {
   constructor(
     @InjectRepository(Document)
-    private readonly newsRepository: Repository<Document>,
+    private readonly documentRepository: Repository<Document>,
   ) {}
 
-  async saveDocuments(documents: any, requestId: number) {
+  async saveDocuments(documents: any, request: any) {
+    const requestId = request.id;
     for (const document of documents) {
-      const newDocument = this.newsRepository.create({
+      const newDocument = this.documentRepository.create({
         ...document,
         requestId,
         status: DocumentStatus.PENDING,
       });
-      await this.newsRepository.save(newDocument);
+      await this.documentRepository.save(newDocument);
     }
   }
 
@@ -37,13 +38,19 @@ export class DocumentsService {
         ) {
           return { ...document, type: DocumentType.DOCUMENT };
         } else {
-          break;
+          throw new HttpException(
+            'Invalid files format uploaded',
+            HttpStatus.FORBIDDEN,
+          );
         }
       case DocumentTypes.SELFIE:
         if (document.rawData.includes('/^data:image/png;base64,/')) {
           return { ...document, type: DocumentType.PICTURE };
         } else {
-          break;
+          throw new HttpException(
+            'Invalid files format uploaded',
+            HttpStatus.FORBIDDEN,
+          );
         }
       default:
         throw new HttpException(
@@ -51,5 +58,25 @@ export class DocumentsService {
           HttpStatus.FORBIDDEN,
         );
     }
+  }
+
+  async modifyDocumentStatus(document: any, requestId: number) {
+    if (!document.documentType || !requestId)
+      throw new HttpException('Invalid document data', HttpStatus.FORBIDDEN);
+    const documentToUpdate = await this.documentRepository.findOne({
+      where: {
+        documentType: document.documentType,
+        requestId,
+      },
+    });
+    if (!['pending', 'approved', 'rejected'].includes(document.status)) {
+      throw new HttpException('Invalid document status', HttpStatus.FORBIDDEN);
+    }
+    documentToUpdate.status = document.status;
+    return this.documentRepository.save(documentToUpdate);
+  }
+
+  async getDocumentById(id: number) {
+    return this.documentRepository.findOne({ where: { id } });
   }
 }

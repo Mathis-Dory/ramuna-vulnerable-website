@@ -63,4 +63,12 @@ export class NewsService {
     }
     return;
   }
+
+  async searchNews(query: string): Promise<News[]> {
+    return this.newsRepository
+      .createQueryBuilder('news')
+      .where('news.title ILIKE :query', { query: `%${query}%` })
+      .orWhere('news.body ILIKE :query', { query: `%${query}%` })
+      .getMany();
+  }
 }

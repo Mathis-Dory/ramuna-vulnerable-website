@@ -11,10 +11,10 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { LoginUserDto, RegisterUserDto } from '../../dto/users.dtos';
-import { UsersService } from 'src/users/services/users/users.service';
+import { UsersService } from '../../../users/services/users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { Role } from 'src/common/role.enum';
-import { Roles } from 'src/common/role.decorator';
+import { Role } from '../../../common/role.enum';
+import { Roles } from '../../../common/role.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -22,8 +22,7 @@ export class UsersController {
     private readonly userService: UsersService,
     private jwtService: JwtService,
   ) {}
-
-  @Roles(Role.User)
+  @Roles(Role.Admin)
   @Get('/users')
   getUsers() {
     return this.userService.getUsers();

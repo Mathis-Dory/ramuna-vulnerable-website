@@ -11,8 +11,22 @@ export class SubmitRequestDto {
   @IsNotEmpty()
   data: any = {};
 
+  @IsArray()
+  @ArrayNotEmpty()
+  @ArrayMinSize(4)
+  @ArrayMaxSize(4)
+  documents: DocumentDto[];
+}
+
+export class EditRequestDto {
   @IsNotEmpty()
-  userId: number;
+  data: any = {};
+
+  @IsNotEmpty()
+  status: string;
+
+  @IsNotEmpty()
+  asigneeId: number;
 
   @IsArray()
   @ArrayNotEmpty()

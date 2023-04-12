@@ -17,6 +17,10 @@ export class UsersService {
     return this.userRepository.find();
   }
 
+  async getAdminUsers() {
+    return this.userRepository.find({ where: { role: UserRoles.ADMIN } });
+  }
+
   findUsersById(id: number) {
     return this.userRepository.findOneBy({ id });
   }
@@ -26,7 +30,9 @@ export class UsersService {
   }
 
   async getUserIdFromJwt(token: string) {
-    const user = await this.userRepository.findOneBy({ token });
+    const user = await this.userRepository.findOneBy({
+      token: token.split('Bearer ')[1],
+    });
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     return user.id;
   }

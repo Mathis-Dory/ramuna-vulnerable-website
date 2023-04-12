@@ -7,6 +7,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   Res,
   UsePipes,
   ValidationPipe,
@@ -79,5 +80,10 @@ export class NewsController {
         .status(HttpStatus.OK)
         .json(await this.newsService.deleteNews(id));
     }
+  }
+
+  @Get('search')
+  async searchNews(@Query('query') query: string) {
+    return this.newsService.searchNews(query);
   }
 }
