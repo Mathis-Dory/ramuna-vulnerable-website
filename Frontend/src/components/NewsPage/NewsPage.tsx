@@ -1,5 +1,4 @@
 import React, { FC, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import NavigationBar from "../NavigationBar/NavigationBar.lazy";
 import Footer from "../Footer/Footer.lazy";
 import {
@@ -22,17 +21,16 @@ interface NewsPageProps {}
 interface News {
   title: string;
   body: string;
-  image?: string;
+  file?: string | File;
 }
 
 const NewsPage: FC<NewsPageProps> = () => {
-  const history = useNavigate();
   const [news, setNews] = useState<News[]>([]);
   const [isSpinnerOpen, setIsSpinnerOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [image, setImage] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>(null);
 
   const getNewsData = async () => {
     try {
@@ -58,46 +56,45 @@ const NewsPage: FC<NewsPageProps> = () => {
     }
   };
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const selectedFile = files[0];
+      if (selectedFile.type.startsWith("image/")) {
+        setFile(selectedFile);
+      } else {
+        alert("File type not supported. Please select an image file.");
+      }
+    }
+  };
+
   const handleCloseModal = () => {
     setOpenModal(false);
     setTitle("");
     setBody("");
-    setImage(null);
-  };
-
-  const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(event.target.value);
-  };
-
-  const handleBodyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setBody(event.target.value);
-  };
-
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      setImage(event.target.files[0]);
-    }
+    setFile(null);
   };
 
   const handleCreatePost = async () => {
     setIsSpinnerOpen(true);
     try {
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("body", body);
-      if (image) {
-        formData.append("image", image);
-      }
+      const data = {
+        title: title,
+        body: body,
+        file: file,
+      };
+      console.log(data);
+      const token = localStorage.getItem("token");
       await apiRequest({
         method: "POST",
         url: "/news/postNews",
-        data: formData,
+        data: data,
         headers: {
-          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
         },
       });
       handleCloseModal();
-      getNewsData();
+      await getNewsData();
       toast.success("Post created successfully.", {
         position: "top-center",
         autoClose: 4000,
@@ -160,9 +157,15 @@ const NewsPage: FC<NewsPageProps> = () => {
           }}
         >
           {news.map((item, index) => (
-            <Grid className="pl-6 pr-6">
+            <Grid key={index} className="pl-6 pr-6">
               <Card key={index} className="mt-[4rem]">
-                {item.image && <CardMedia component="img" height="300" image={item.image} />}
+                {item.file && (
+                  <CardMedia
+                    component="img"
+                    height="300"
+                    image={URL.createObjectURL(new Blob([item.file]))}
+                  />
+                )}
                 <CardContent>
                   <Typography gutterBottom variant="h5" component="div">
                     {item.title}
@@ -183,49 +186,54 @@ const NewsPage: FC<NewsPageProps> = () => {
         aria-describedby="create-a-new-post-form"
         maxWidth="xl"
         fullWidth={true}
-        sx={{ padding: 4 }}
       >
-        <Box>
-          <Typography component="h2" variant="h6" sx={{ textAlign: "center", paddingY: "4rem" }}>
+        <Box className="p-4">
+          <Typography component="h2" variant="h6" sx={{ textAlign: "center", paddingBottom: 2 }}>
             Create a new post
           </Typography>
-          <Box component="form" sx={{ mt: 4, paddingX: "4rem" }}>
-            <TextField
-              id="post-title"
-              label="Post Title"
-              variant="outlined"
-              fullWidth
-              sx={{ mb: 2 }}
+          <TextField
+            fullWidth
+            variant="outlined"
+            name="title"
+            label="Title"
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+            sx={{ paddingBottom: 2 }}
+          />
+          <TextField
+            fullWidth
+            multiline
+            rows={10}
+            variant="outlined"
+            name="body"
+            label="Body"
+            value={body}
+            onChange={(event) => setBody(event.target.value)}
+            sx={{ paddingBottom: 2 }}
+          />
+          <Button variant="contained" component="label" sx={{ paddingBottom: 2 }}>
+            Upload Image/PDF
+            <input
+              type="file"
+              accept=".jpg,.jpeg,.png,.pdf,.gif"
+              hidden
+              name="file"
+              onChange={handleFileChange}
             />
-            <TextField
-              id="post-message"
-              label="Post Message"
-              multiline
-              rows={4}
-              variant="outlined"
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Box sx={{ mr: 2 }}>
-                <Typography variant="subtitle1">Upload Image</Typography>
-              </Box>
-              <Box>
-                <Button variant="contained" component="label">
-                  Choose File
-                  <input type="file" hidden />
-                </Button>
-              </Box>
-            </Box>
-            <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2, mb: 2 }}>
-              <Button variant="contained" onClick={() => setOpenModal(false)} sx={{ mr: 2 }}>
-                Cancel
-              </Button>
-              <Button variant="contained" color="primary" onClick={handleCreatePost}>
-                Save
-              </Button>
-            </Box>
-          </Box>
+          </Button>
+          <div className="flex justify-end pt-8">
+            <Button variant="contained" onClick={handleCloseModal} sx={{ marginRight: 2 }}>
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleCreatePost}
+              color="primary"
+              disabled={isSpinnerOpen}
+            >
+              Create post
+            </Button>
+          </div>
         </Box>
       </Dialog>
       <Footer />

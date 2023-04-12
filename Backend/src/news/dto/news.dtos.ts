@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsMimeType, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class NewsDto {
   @IsNotEmpty()
