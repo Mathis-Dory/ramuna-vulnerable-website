@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState } from "react";
 import NavigationBar from "../NavigationBar/NavigationBar.lazy";
 import Footer from "../Footer/Footer.lazy";
+
 import {
   Box,
   Card,
@@ -22,7 +23,7 @@ interface NewsPageProps {}
 interface News {
   title: string;
   body: string;
-  file?: string | File;
+  file?: Blob | null;
 }
 
 const NewsPage: FC<NewsPageProps> = () => {
@@ -32,7 +33,7 @@ const NewsPage: FC<NewsPageProps> = () => {
   const [openModal, setOpenModal] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [file, setFile] = useState<string | null>(null);
+  const [file, setFile] = useState<null | Blob>(null);
 
   useEffect(() => {
     const getAdminStatus = async () => {
@@ -71,27 +72,12 @@ const NewsPage: FC<NewsPageProps> = () => {
     if (files && files.length > 0) {
       const selectedFile = files[0];
       if (selectedFile.type.startsWith("image/")) {
-        const base64 = await convertToBase64(selectedFile);
-        setFile(base64 as string | null);
+        setFile(selectedFile as File);
       } else {
         alert("File type not supported. Please select an image file.");
       }
     }
   };
-
-  const convertToBase64 = (file: File) => {
-    return new Promise((resolve, reject) => {
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(file);
-      fileReader.onload = () => {
-        resolve(fileReader.result);
-      };
-      fileReader.onerror = (error) => {
-        reject(error);
-      };
-    });
-  };
-
   const handleCloseModal = () => {
     setOpenModal(false);
     setTitle("");
@@ -102,18 +88,21 @@ const NewsPage: FC<NewsPageProps> = () => {
   const handleCreatePost = async () => {
     setIsSpinnerOpen(true);
     try {
-      const data = {
-        title: title,
-        body: body,
-        file: file,
-      };
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("body", body);
+      if (file) {
+        formData.append("file", file);
+      }
+
       const token = localStorage.getItem("token");
       await apiRequest({
         method: "POST",
         url: "/news/postNews",
-        data: data,
+        data: formData,
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
       });
       handleCloseModal();
