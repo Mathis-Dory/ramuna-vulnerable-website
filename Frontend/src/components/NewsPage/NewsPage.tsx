@@ -20,14 +20,22 @@ import { isAdmin } from "../../shared/utils/Login";
 
 interface NewsPageProps {}
 
-interface News {
+interface GetNews {
   title: string;
   body: string;
-  file?: Blob | null;
+  binaryData?: BinaryData | null;
+  id: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface BinaryData {
+  type: string;
+  data: number[];
 }
 
 const NewsPage: FC<NewsPageProps> = () => {
-  const [news, setNews] = useState<News[]>([]);
+  const [news, setNews] = useState<GetNews[]>([]);
   const [admin, setAdmin] = useState(false);
   const [isSpinnerOpen, setIsSpinnerOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -49,7 +57,7 @@ const NewsPage: FC<NewsPageProps> = () => {
         method: "GET",
         url: `/news/allNews`,
       });
-      setNews(response.data as News[]);
+      setNews(response.data as GetNews[]);
       setIsSpinnerOpen(false);
     } catch (error: any) {
       setIsSpinnerOpen(false);
@@ -174,11 +182,18 @@ const NewsPage: FC<NewsPageProps> = () => {
           {news.map((item, index) => (
             <Grid key={index} className="pl-6 pr-6">
               <Card key={index} className="mt-[4rem]">
-                {item.file && (
+                {item.binaryData && (
                   <CardMedia
                     component="img"
-                    height="300"
-                    image={URL.createObjectURL(new Blob([item.file]))}
+                    height="140"
+                    image={
+                      item.binaryData &&
+                      URL.createObjectURL(
+                        new Blob([new Uint8Array(item.binaryData.data)], {
+                          type: item.binaryData.type,
+                        }),
+                      )
+                    }
                   />
                 )}
                 <CardContent>
@@ -227,7 +242,7 @@ const NewsPage: FC<NewsPageProps> = () => {
             sx={{ paddingBottom: 2 }}
           />
           <Button variant="contained" component="label" sx={{ paddingBottom: 2 }}>
-            Upload Image/PDF
+            Upload Image
             <input
               type="file"
               accept=".jpg,.jpeg,.png,.pdf,.gif"
