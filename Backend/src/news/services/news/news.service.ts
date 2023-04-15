@@ -38,14 +38,19 @@ export class NewsService {
     });
   }
 
-  async postNews(news: NewsDto) {
-    console.log(news);
-    const newNews = this.newsRepository.create({
-      ...news,
-      binaryData: Buffer.from(news.file, 'base64'),
-    });
-    console.log(newNews);
-    return await this.newsRepository.save(newNews);
+  async postNews(news: NewsDto, file: Buffer = null) {
+    if (file) {
+      const newNews = this.newsRepository.create({
+        ...news,
+        binaryData: file,
+      });
+      return await this.newsRepository.save(newNews);
+    } else {
+      const newNews = this.newsRepository.create({
+        ...news,
+      });
+      return await this.newsRepository.save(newNews);
+    }
   }
 
   async editNews(id: number, newsDTO: UpdateNewsDto) {
@@ -66,7 +71,7 @@ export class NewsService {
     }
 
     if (file) {
-      news.binaryData = Buffer.from(file, 'base64'); // Convert base64 string to Buffer
+      news.binaryData = file;
     }
 
     return await this.newsRepository.save(news);

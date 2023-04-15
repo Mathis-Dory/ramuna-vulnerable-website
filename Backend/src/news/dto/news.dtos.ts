@@ -8,11 +8,11 @@ export class NewsDto {
   body: string;
 
   @IsOptional()
-  file?: string;
+  file?: Express.Multer.File | null;
 }
 
 export class UpdateNewsDto {
   title?: string;
   body?: string;
-  file?: string;
+  file?: Buffer;
 }
