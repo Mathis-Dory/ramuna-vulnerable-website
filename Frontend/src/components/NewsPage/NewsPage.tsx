@@ -15,6 +15,7 @@ import {
 import { apiRequest } from "../../shared/utils/Axios";
 import { toast } from "react-toastify";
 import { Spinner } from "../../shared/utils/Spinner";
+import { isAdmin } from "../../shared/utils/Login";
 
 interface NewsPageProps {}
 
@@ -26,11 +27,20 @@ interface News {
 
 const NewsPage: FC<NewsPageProps> = () => {
   const [news, setNews] = useState<News[]>([]);
+  const [admin, setAdmin] = useState(false);
   const [isSpinnerOpen, setIsSpinnerOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getAdminStatus = async () => {
+      const adminStatus = await isAdmin();
+      setAdmin(adminStatus);
+    };
+    getAdminStatus();
+  }, []);
 
   const getNewsData = async () => {
     try {
@@ -56,16 +66,30 @@ const NewsPage: FC<NewsPageProps> = () => {
     }
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
       const selectedFile = files[0];
       if (selectedFile.type.startsWith("image/")) {
-        setFile(selectedFile);
+        const base64 = await convertToBase64(selectedFile);
+        setFile(base64 as string | null);
       } else {
         alert("File type not supported. Please select an image file.");
       }
     }
+  };
+
+  const convertToBase64 = (file: File) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
   };
 
   const handleCloseModal = () => {
@@ -83,7 +107,6 @@ const NewsPage: FC<NewsPageProps> = () => {
         body: body,
         file: file,
       };
-      console.log(data);
       const token = localStorage.getItem("token");
       await apiRequest({
         method: "POST",
@@ -132,11 +155,14 @@ const NewsPage: FC<NewsPageProps> = () => {
   return (
     <div className="bg-primary">
       <NavigationBar />
-      <div className="flex w-full justify-end p-10">
-        <button className="btn-secondary btn" onClick={handleCreateNewPost}>
-          Create new post
-        </button>
-      </div>
+      {admin ? (
+        <div className="flex w-full justify-end p-10">
+          <button className="btn-secondary btn" onClick={handleCreateNewPost}>
+            Create new post
+          </button>
+        </div>
+      ) : null}
+
       <Box
         sx={{
           display: "flex",

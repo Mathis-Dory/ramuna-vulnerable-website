@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { News } from '../../../typeorm';
-import { NewsDto, UpdateNewsDto } from '../../../news/dto/news.dtos';
+import { NewsDto, UpdateNewsDto } from '../../dto/news.dtos';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -33,22 +33,23 @@ export class NewsService {
   }
 
   async findNewsByTitle(news: NewsDto) {
-    const foundNews = await this.newsRepository.findOneBy({
+    return await this.newsRepository.findOneBy({
       title: news.title,
     });
-    return foundNews;
   }
 
   async postNews(news: NewsDto) {
+    console.log(news);
     const newNews = this.newsRepository.create({
       ...news,
-      binaryData: Buffer.from(news.binaryData, 'base64'),
+      binaryData: Buffer.from(news.file, 'base64'),
     });
+    console.log(newNews);
     return await this.newsRepository.save(newNews);
   }
 
   async editNews(id: number, newsDTO: UpdateNewsDto) {
-    const { title, body, binaryData } = newsDTO;
+    const { title, body, file } = newsDTO;
 
     const news = await this.newsRepository.findOne({ where: { id } });
 
@@ -64,8 +65,8 @@ export class NewsService {
       news.body = body;
     }
 
-    if (binaryData) {
-      news.binaryData = Buffer.from(binaryData, 'base64'); // Convert base64 string to Buffer
+    if (file) {
+      news.binaryData = Buffer.from(file, 'base64'); // Convert base64 string to Buffer
     }
 
     return await this.newsRepository.save(news);

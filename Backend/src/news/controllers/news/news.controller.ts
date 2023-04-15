@@ -12,10 +12,10 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { NewsService } from '../../../news/services/news/news.service';
+import { NewsService } from '../../services/news/news.service';
 import { Roles } from '../../../common/role.decorator';
 import { Role } from '../../../common/role.enum';
-import { NewsDto, UpdateNewsDto } from '../../../news/dto/news.dtos';
+import { NewsDto, UpdateNewsDto } from '../../dto/news.dtos';
 
 @Controller('news')
 export class NewsController {
