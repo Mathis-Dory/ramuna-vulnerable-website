@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Request } from '../../../typeorm';
-import { RequestStatus } from '../../../requests/request.enums';
+import { RequestStatus } from '../../request.enums';
 import { DocumentDto } from '../../../documents/dto/documents.dtos';
 import { DocumentsService } from '../../../documents/services/documents/documents.service';
-import { EditRequestDto } from '../../../requests/dto/requests.dtos';
+import { EditRequestDto } from '../../dto/requests.dtos';
 import { DocumentStatus } from '../../../documents/documents.enum';
 
 @Injectable()
@@ -33,13 +33,12 @@ export class RequestsService {
   }
 
   async findPendingApprovedByUserId(id: number) {
-    const request = await this.requestRepository.findOne({
+    return await this.requestRepository.findOne({
       where: {
         userId: id,
         status: RequestStatus.APPROVED,
       },
     });
-    return request;
   }
 
   async findAllReuqestsByUserIdWithDocuments(id: number) {
@@ -61,12 +60,11 @@ export class RequestsService {
     if (!id) {
       throw new Error('No id proviaded');
     }
-    const request = await this.requestRepository.findOne({
+    return await this.requestRepository.findOne({
       where: {
         id,
       },
     });
-    return request;
   }
 
   async getAllAssignedRequests(id: number, getDocumentsData?: boolean) {
@@ -92,13 +90,12 @@ export class RequestsService {
   }
 
   async getAllUnasignedRequests() {
-    const requests = await this.requestRepository.find({
+    return await this.requestRepository.find({
       where: {
         status: RequestStatus.UNASIGNED,
         asigneeId: -1,
       },
     });
-    return requests;
   }
 
   async validateRawFiles(

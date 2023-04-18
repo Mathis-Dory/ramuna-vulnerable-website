@@ -25,10 +25,10 @@ const FrontPage: FC<FrontPageProps> = () => {
             alt={"Romunia fictive flag"}
           />
           <div>
-            <h1 className="text-5xl font-bold">Welcome to the website of Romunia government!</h1>
+            <h1 className="text-5xl font-bold">Welcome to the website of the Ramuna government!</h1>
             <p className="py-6">
               Our website is build with the latest technologies for the best user experience and the
-              comfort of our citizens. If you desire to immigrate to Romunia, you can register for
+              comfort of our citizens. If you desire to immigrate to Ramuna, you can register for
               citizenship and we will contact you as soon as possible.
             </p>
             <p className="flex-column flex gap-6">

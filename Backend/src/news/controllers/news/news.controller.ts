@@ -9,13 +9,16 @@ import {
   Post,
   Query,
   Res,
+  UploadedFile,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { NewsService } from '../../../news/services/news/news.service';
+import { NewsService } from '../../services/news/news.service';
 import { Roles } from '../../../common/role.decorator';
 import { Role } from '../../../common/role.enum';
-import { NewsDto, UpdateNewsDto } from '../../../news/dto/news.dtos';
+import { NewsDto, UpdateNewsDto } from '../../dto/news.dtos';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('news')
 export class NewsController {
@@ -33,10 +36,19 @@ export class NewsController {
   @Roles(Role.Admin)
   @Post('/postNews')
   @UsePipes(ValidationPipe)
-  async postNews(@Res() response, @Body() postNewsDto: NewsDto) {
+  @UseInterceptors(FileInterceptor('file'))
+  async postNews(
+    @Res() response,
+    @Body() postNewsDto: NewsDto,
+    @UploadedFile() file,
+  ) {
     const existingNews = await this.newsService.findNewsByTitle(postNewsDto);
     if (!existingNews) {
-      await this.newsService.postNews(postNewsDto);
+      if (file) {
+        await this.newsService.postNews(postNewsDto, file.buffer);
+      } else {
+        await this.newsService.postNews(postNewsDto);
+      }
     } else {
       return response.status(HttpStatus.CONFLICT).json({
         message: 'News already exists with this title',

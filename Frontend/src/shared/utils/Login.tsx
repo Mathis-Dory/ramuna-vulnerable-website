@@ -1,4 +1,5 @@
 import { apiRequest } from "./Axios";
+import { User } from "./Type";
 
 export function isLoggedIn() {
   return localStorage.getItem("token") !== null && localStorage.getItem("token") !== "undefined";
@@ -24,4 +25,10 @@ export async function getCurrentUser() {
     console.log(err);
     return err;
   }
+}
+
+export async function isAdmin(): Promise<boolean> {
+  const response = await getCurrentUser();
+  const user = response as User;
+  return user.role === "admin";
 }

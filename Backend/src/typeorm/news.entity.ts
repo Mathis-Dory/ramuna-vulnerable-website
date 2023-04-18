@@ -43,4 +43,5 @@ export class News {
     onUpdate: 'CURRENT_TIMESTAMP(6)',
   })
   public updated_at: Date;
+  news: File;
 }

@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class NewsDto {
   @IsNotEmpty()
@@ -7,12 +7,12 @@ export class NewsDto {
   @IsNotEmpty()
   body: string;
 
-  @IsNotEmpty()
-  binaryData?: string;
+  @IsOptional()
+  file?: Express.Multer.File | null;
 }
 
 export class UpdateNewsDto {
   title?: string;
   body?: string;
-  binaryData?: string;
+  file?: Buffer;
 }
