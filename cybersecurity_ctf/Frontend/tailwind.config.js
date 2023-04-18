@@ -8,7 +8,7 @@ module.exports = {
   daisyui: {
     themes: [
       {
-        romunia: {
+        ramuna: {
           primary: "#293462",
 
           primaryLight: "#2e6688",

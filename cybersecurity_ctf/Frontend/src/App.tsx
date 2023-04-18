@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import NewsPageLazy from "./components/NewsPage/NewsPage.lazy";
 import SignInPageLazy from "./components/SignInPage/SignInPage.lazy";
 import ContactPageLazy from "./components/ContactPage/ContactPage.lazy";
+import RegistrationPageLazy from "./components/RegistrationPage/RegistrationPage.lazy";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/contact" element={<ContactPageLazy />} />
           <Route path="/signUp" element={<SignUpPageLazy />} />
           <Route path="/signIn" element={<SignInPageLazy />} />
+          <Route path="/citizenship" element={<RegistrationPageLazy />} />
             <Route path="/news" element={<NewsPageLazy />} />
         </Routes>
       </BrowserRouter>
