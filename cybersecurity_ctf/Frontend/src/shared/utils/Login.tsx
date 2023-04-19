@@ -27,7 +27,7 @@ export async function getCurrentUser() {
   }
 }
 
-export async function isAdmin(): Promise<boolean> {
+export async function isAdminRole(): Promise<boolean> {
   const response = await getCurrentUser();
   const user = response as User;
   return user.role === "admin";

@@ -43,11 +43,11 @@ export class RequestsController {
       let checkedData = [];
       try {
         checkedData = await this.requestsService.validateRawFiles(
-          submitRequestDto.documents,
+          submitRequestDto.pdf,
           this.documentsService,
         );
         const savedRequest = await this.requestsService.saveRequest({
-          data: submitRequestDto.data,
+          data: submitRequestDto.image,
           userId,
         });
         await this.documentsService.saveDocuments(checkedData, savedRequest);
@@ -55,7 +55,7 @@ export class RequestsController {
           status: 'OK',
           userId,
           documents: checkedData,
-          additionalInfo: submitRequestDto.data,
+          additionalInfo: submitRequestDto,
         });
       } catch (err) {
         throw err;
