@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import NavigationBar from "../NavigationBar/NavigationBar.lazy";
 import Footer from "../Footer/Footer.lazy";
 import { Alert, AlertTitle, Box, Button } from "@mui/material";
@@ -6,23 +6,28 @@ import { Spinner } from "../../shared/utils/Spinner";
 import { useNavigate } from "react-router-dom";
 import { apiRequest } from "../../shared/utils/Axios";
 import { toast } from "react-toastify";
-import { isLoggedIn } from "../../shared/utils/Login";
+import { getCurrentUser, isLoggedIn } from "../../shared/utils/Login";
 import { DropzoneInputProps, DropzoneRootProps, useDropzone } from "react-dropzone";
+import { User } from "../../shared/utils/Type";
 
 interface RegistrationPageProps {}
+
+const MAX_PDF_FILES = 1;
+const MAX_IMAGE_FILES = 1;
 
 interface Application {
   name: string;
   email: string;
-  files: File[];
+  files: { pdf: File[]; image: File[] };
 }
 
 const RegistrationPage: FC<RegistrationPageProps> = () => {
   const history = useNavigate();
+  const token = localStorage.getItem("token");
   const [formValues, setFormValues] = useState<Application>({
     name: "",
     email: "",
-    files: [],
+    files: { pdf: [], image: [] },
   });
   const [alert, setAlert] = useState<{
     message: string;
@@ -33,14 +38,72 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
   };
   const [, setIsSubmitted] = useState(false);
   const [isSpinnerOpen, setIsSpinnerOpen] = useState(false);
+  const [, setApplication] = useState<Application | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    setIsSpinnerOpen(true);
+    getApplication();
+    loadCurrentUser();
+  }, []);
+
+  const loadCurrentUser = async () => {
+    try {
+      const response = await getCurrentUser();
+      setCurrentUser(response as User);
+    } catch (error: any) {
+      setIsSpinnerOpen(false);
+      const errorServer = "Not able to retrieve current user.";
+      toast.error(errorServer, {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    }
+  };
+
+  const getApplication = async () => {
+    try {
+      const response = await apiRequest({
+        method: "GET",
+        url: `/requests/requestsHistory`,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setApplication(response.data as Application);
+    } catch (error: any) {
+      setIsSpinnerOpen(false);
+      const errorServer = "Server error when retrieving application.";
+      toast.error(errorServer, {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    }
+  };
 
   const handleSignUpClick = () => {
     history("/signUp");
   };
   const onDrop = (acceptedFiles: File[]) => {
+    const pdfFiles = acceptedFiles.filter((file) => file.type === "application/pdf");
+    const imageFiles = acceptedFiles.filter((file) => file.type.startsWith("image/"));
+
     setFormValues((prevValues) => ({
       ...prevValues,
-      files: [...prevValues.files, ...acceptedFiles],
+      files: {
+        pdf: [...prevValues.files.pdf, ...pdfFiles],
+        image: [...prevValues.files.image, ...imageFiles],
+      },
     }));
   };
 
@@ -52,7 +115,7 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
   });
 
   const renderDropzone = (rootProps: DropzoneRootProps, inputProps: DropzoneInputProps) => (
-    <div {...rootProps} className="boerder-solid  border-4 p-8">
+    <div {...rootProps} className="border-4  border-solid p-8">
       <input {...inputProps} />
       {isDragActive ? (
         <p>Drop files here...</p>
@@ -62,21 +125,43 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
     </div>
   );
 
+  const handleClearDropzone = () => {
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      files: { pdf: [], image: [] },
+    }));
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!formValues.files.length) {
-      setErrorMessage("Please upload your documents.", "error");
+    if (formValues.files.pdf.length === 0 || formValues.files.image.length === 0) {
+      setErrorMessage("Please upload one PDF and one image.", "error");
+      return;
+    }
+    if (formValues.files.pdf.length > MAX_PDF_FILES) {
+      setErrorMessage(`Please upload no more than ${MAX_PDF_FILES} PDF files.`, "error");
+      return;
+    }
+    if (formValues.files.image.length > MAX_IMAGE_FILES) {
+      setErrorMessage(`Please upload no more than ${MAX_IMAGE_FILES} image files.`, "error");
       return;
     }
     setIsSpinnerOpen(true);
     try {
       // Send form data to server using Axios.
       const formData = new FormData();
-      formValues.files.forEach((file) => {
-        formData.append("files", file);
+
+      // Loop through the PDF files
+      formValues.files.pdf.slice(0, MAX_PDF_FILES).forEach((file) => {
+        formData.append("pdf", file);
       });
-      formData.append("name", formValues.name);
-      const token = localStorage.getItem("token");
+
+      // Loop through the image files
+      formValues.files.image.slice(0, MAX_IMAGE_FILES).forEach((file) => {
+        formData.append("image", file);
+      });
+      formData.append("name", currentUser?.firstName + " " + currentUser?.lastName);
+      formData.append("email", currentUser?.email || "");
       const response = await apiRequest({
         method: "POST",
         url: `requests/postRequest`,
@@ -132,19 +217,42 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
                 {alert.message}
               </Alert>
             )}
-            <h1 className="p-12 text-4xl text-secondary">Apply for Citizenship</h1>
+            <h1 className="p-12 text-4xl text-secondary underline">Apply for citizenship</h1>
             <form className="mt-2 flex flex-col items-center" onSubmit={handleSubmit}>
               {renderDropzone(getRootProps(), getInputProps())}
               <div className="mb-6 mt-6">
-                {formValues.files.map((file) => (
+                <p className="text-secondary">
+                  Please upload your proof of residence (PDF) and your passport (image).{" "}
+                  <span className="text-error">Max file size: 10MB.</span>
+                </p>
+                <ul>
+                  <li>{formValues.files.pdf.length} PDF file(s) uploaded</li>
+                  <li>{formValues.files.image.length} image(s) uploaded</li>
+                </ul>
+                {formValues.files.pdf.slice(0, MAX_PDF_FILES).map((file) => (
+                  <p key={file.name}>
+                    {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                  </p>
+                ))}
+                {formValues.files.image.slice(0, MAX_IMAGE_FILES).map((file) => (
                   <p key={file.name}>
                     {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
                   </p>
                 ))}
               </div>
-              <Button type="submit" variant="contained" color="primary">
-                Submit
-              </Button>
+              <div className="flex gap-4">
+                <Button type="submit" variant="contained" color="primary">
+                  Submit
+                </Button>
+                <Button
+                  className="btn-warning"
+                  onClick={handleClearDropzone}
+                  variant="contained"
+                  color="warning"
+                >
+                  Clear documents
+                </Button>
+              </div>
             </form>
             <p className="mt-6 p-4">
               In order to apply for the Ramuna citizenship, please upload your passport and the
