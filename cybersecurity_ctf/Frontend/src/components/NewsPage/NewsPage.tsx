@@ -16,7 +16,7 @@ import {
 import { apiRequest } from "../../shared/utils/Axios";
 import { toast } from "react-toastify";
 import { Spinner } from "../../shared/utils/Spinner";
-import { isAdmin } from "../../shared/utils/Login";
+import { isAdminRole, isLoggedIn } from "../../shared/utils/Login";
 
 interface NewsPageProps {}
 
@@ -44,36 +44,36 @@ const NewsPage: FC<NewsPageProps> = () => {
   const [file, setFile] = useState<null | Blob>(null);
 
   useEffect(() => {
-    const getAdminStatus = async () => {
-      const adminStatus = await isAdmin();
-      setAdmin(adminStatus);
+    const fetchData = async () => {
+      setIsSpinnerOpen(true);
+      try {
+        const response = await apiRequest({
+          method: "GET",
+          url: `/news/allNews`,
+        });
+        setNews(response.data as GetNews[]);
+        setIsSpinnerOpen(false);
+      } catch (error: any) {
+        setIsSpinnerOpen(false);
+        if (error.data.message === "No news found in the database.") {
+          setNews([]);
+        } else {
+          toast.error("Error getting news. Please try again.");
+        }
+      }
     };
-    getAdminStatus();
+    fetchData();
   }, []);
 
-  const getNewsData = async () => {
-    try {
-      const response = await apiRequest({
-        method: "GET",
-        url: `/news/allNews`,
-      });
-      setNews(response.data as GetNews[]);
-      setIsSpinnerOpen(false);
-    } catch (error: any) {
-      setIsSpinnerOpen(false);
-      const errorServer = "Unable to get news.";
-      toast.error(errorServer, {
-        position: "top-center",
-        autoClose: 4000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
+  useEffect(() => {
+    const getAdminStatus = async () => {
+      const adminStatus = await isAdminRole();
+      setAdmin(adminStatus);
+    };
+    if (isLoggedIn()) {
+      getAdminStatus();
     }
-  };
+  }, []);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -92,7 +92,6 @@ const NewsPage: FC<NewsPageProps> = () => {
     setBody("");
     setFile(null);
   };
-
   const handleCreatePost = async () => {
     setIsSpinnerOpen(true);
     try {
@@ -113,8 +112,20 @@ const NewsPage: FC<NewsPageProps> = () => {
           "Content-Type": "multipart/form-data",
         },
       });
+
+      const createdNews = {
+        title: title,
+        body: body,
+        binaryData: null,
+        id: news.length + 1,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      setNews([createdNews, ...news]);
       handleCloseModal();
-      await getNewsData();
+      setTitle("");
+      setBody("");
+      setFile(null);
       toast.success("Post created successfully.", {
         position: "top-center",
         autoClose: 4000,
@@ -140,11 +151,6 @@ const NewsPage: FC<NewsPageProps> = () => {
     setIsSpinnerOpen(false);
   };
 
-  useEffect(() => {
-    setIsSpinnerOpen(true);
-    getNewsData();
-  }, []);
-
   const handleCreateNewPost = () => {
     setOpenModal(true);
   };
@@ -167,47 +173,52 @@ const NewsPage: FC<NewsPageProps> = () => {
           alignItems: "center",
           paddingTop: 8,
           paddingBottom: 8,
+          minHeight: "100vh",
         }}
       >
-        <Typography component="h1" variant="h5">
-          Latest news
-        </Typography>
-        <Grid
-          sx={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, 1fr)",
-            justifyContent: "center",
-          }}
-        >
-          {news.map((item, index) => (
-            <Grid key={index} className="pl-6 pr-6">
-              <Card key={index} className="mt-[4rem]">
-                {item.binaryData && (
-                  <CardMedia
-                    component="img"
-                    height="140"
-                    image={
-                      item.binaryData &&
-                      URL.createObjectURL(
-                        new Blob([new Uint8Array(item.binaryData.data)], {
-                          type: item.binaryData.type,
-                        }),
-                      )
-                    }
-                  />
-                )}
-                <CardContent>
-                  <Typography gutterBottom variant="h5" component="div">
-                    {item.title}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {item.body}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+        <h1 className="text-4xl text-secondary underline">Latest news</h1>
+        {news.length === 0 ? (
+          <h2 className="p-12 text-3xl">
+            Sorry, there are no news for the moment. Come back later.
+          </h2>
+        ) : (
+          <Grid
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(2, 1fr)",
+              justifyContent: "center",
+            }}
+          >
+            {news.map((item, index) => (
+              <Grid key={index} className="pl-6 pr-6">
+                <Card key={index} className="mt-[4rem]">
+                  {item.binaryData && (
+                    <CardMedia
+                      component="img"
+                      height="140"
+                      image={
+                        item.binaryData &&
+                        URL.createObjectURL(
+                          new Blob([new Uint8Array(item.binaryData.data)], {
+                            type: item.binaryData.type,
+                          }),
+                        )
+                      }
+                    />
+                  )}
+                  <CardContent>
+                    <Typography gutterBottom variant="h5" component="div">
+                      {item.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {item.body}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
       </Box>
       <Dialog
         open={openModal}

@@ -13,10 +13,7 @@ export class NewsService {
   async getAllNews() {
     const news = await this.newsRepository.find();
     if (news.length === 0) {
-      throw new HttpException(
-        'No news found in the database.',
-        HttpStatus.NOT_FOUND,
-      );
+      return false;
     }
     return news;
   }
