@@ -6,9 +6,10 @@ import { Spinner } from "../../shared/utils/Spinner";
 import { useNavigate } from "react-router-dom";
 import { apiRequest } from "../../shared/utils/Axios";
 import { toast } from "react-toastify";
-import { getCurrentUser, isLoggedIn } from "../../shared/utils/Login";
+import { getCurrentUser, isAdminRole, isLoggedIn } from "../../shared/utils/Login";
 import { DropzoneInputProps, DropzoneRootProps, useDropzone } from "react-dropzone";
 import { User } from "../../shared/utils/Type";
+import AdminRegistrationPage from "./AdminRegistrationPage";
 
 interface RegistrationPageProps {}
 
@@ -40,12 +41,29 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
   const [isSpinnerOpen, setIsSpinnerOpen] = useState(false);
   const [, setApplication] = useState<Application | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [admin, setAdmin] = useState(false);
 
   useEffect(() => {
     setIsSpinnerOpen(true);
-    getApplication();
-    loadCurrentUser();
+    if (isLoggedIn()) {
+      getAdminStatus();
+    }
+    setIsSpinnerOpen(false);
   }, []);
+
+  useEffect(() => {
+    setIsSpinnerOpen(true);
+    if (!isLoggedIn() && !admin) {
+      getApplication();
+      loadCurrentUser();
+    }
+    setIsSpinnerOpen(false);
+  }, []);
+
+  const getAdminStatus = async () => {
+    const adminStatus = await isAdminRole();
+    setAdmin(adminStatus);
+  };
 
   const loadCurrentUser = async () => {
     try {
@@ -202,91 +220,93 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
     <div>
       <NavigationBar />
       {isLoggedIn() ? (
-        <div className="bg-primary">
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              minHeight: "40rem",
-            }}
-          >
-            {alert && (
-              <Alert severity={alert.severity} onClose={() => setAlert(null)}>
-                <AlertTitle>{alert.severity.toUpperCase()}</AlertTitle>
-                {alert.message}
-              </Alert>
-            )}
-            <h1 className="p-12 text-4xl text-secondary underline">Apply for citizenship</h1>
-            <form className="mt-2 flex flex-col items-center" onSubmit={handleSubmit}>
-              {renderDropzone(getRootProps(), getInputProps())}
-              <div className="mb-6 mt-6">
-                <p className="text-secondary">
-                  Please upload your proof of residence (PDF) and your passport (image).{" "}
-                  <span className="text-error">Max file size: 10MB.</span>
-                </p>
-                <ul>
-                  <li>{formValues.files.pdf.length} PDF file(s) uploaded</li>
-                  <li>{formValues.files.image.length} image(s) uploaded</li>
-                </ul>
-                {formValues.files.pdf.slice(0, MAX_PDF_FILES).map((file) => (
-                  <p key={file.name}>
-                    {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+        admin ? (
+          <AdminRegistrationPage />
+        ) : (
+          <div className="bg-primary">
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                minHeight: "40rem",
+              }}
+            >
+              {alert && (
+                <Alert severity={alert.severity} onClose={() => setAlert(null)}>
+                  <AlertTitle>{alert.severity.toUpperCase()}</AlertTitle>
+                  {alert.message}
+                </Alert>
+              )}
+              <h1 className="p-12 text-4xl text-secondary underline">Apply for citizenship</h1>
+              <form className="mt-2 flex flex-col items-center" onSubmit={handleSubmit}>
+                {renderDropzone(getRootProps(), getInputProps())}
+                <div className="mb-6 mt-6">
+                  <p className="text-secondary">
+                    Please upload your proof of residence (PDF) and your passport (image).{" "}
+                    <span className="text-error">Max file size: 10MB.</span>
                   </p>
-                ))}
-                {formValues.files.image.slice(0, MAX_IMAGE_FILES).map((file) => (
-                  <p key={file.name}>
-                    {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                  </p>
-                ))}
-              </div>
-              <div className="flex gap-4">
-                <Button type="submit" variant="contained" color="primary">
-                  Submit
-                </Button>
-                <Button
-                  className="btn-warning"
-                  onClick={handleClearDropzone}
-                  variant="contained"
-                  color="warning"
-                >
-                  Clear documents
-                </Button>
-              </div>
-            </form>
-            <p className="mt-6 p-4">
-              In order to apply for the Ramuna citizenship, please upload your passport and the
-              proof of residence. Note that you can apply only once at time, after you click the
-              submit button you will not be able to upload new documents. If you want to upload new
-              documents, please contact the Ramuna government.
-            </p>
-            <p className="mt-6 p-4">
-              Your application will receive the pending status and need to be reviewed by the admin.
-              Once the admin has reviewed your application, you will receive an email with the
-              status of your application.
-            </p>
-          </Box>
-        </div>
+                  <ul>
+                    <li>{formValues.files.pdf.length} PDF file(s) uploaded</li>
+                    <li>{formValues.files.image.length} image(s) uploaded</li>
+                  </ul>
+                  {formValues.files.pdf.slice(0, MAX_PDF_FILES).map((file) => (
+                    <p key={file.name}>
+                      {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                    </p>
+                  ))}
+                  {formValues.files.image.slice(0, MAX_IMAGE_FILES).map((file) => (
+                    <p key={file.name}>
+                      {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                    </p>
+                  ))}
+                </div>
+                <div className="flex gap-4">
+                  <Button type="submit" variant="contained" color="primary">
+                    Submit
+                  </Button>
+                  <Button
+                    className="btn-warning"
+                    onClick={handleClearDropzone}
+                    variant="contained"
+                    color="warning"
+                  >
+                    Clear documents
+                  </Button>
+                </div>
+              </form>
+              <p className="mt-6 p-4">
+                In order to apply for the Ramuna citizenship, please upload your passport and the
+                proof of residence. Note that you can apply only once at time, after you click the
+                submit button you will not be able to upload new documents. If you want to upload
+                new documents, please contact the Ramuna government.
+              </p>
+              <p className="mt-6 p-4">
+                Your application will receive the pending status and need to be reviewed by the
+                admin. Once the admin has reviewed your application, you will receive an email with
+                the status of your application.
+              </p>
+            </Box>
+          </div>
+        )
       ) : (
-        <>
-          <div className="hero min-h-screen bg-error">
-            <div className="hero-content flex-col lg:flex-row-reverse">
-              <div>
-                <h1 className="text-5xl font-bold">
-                  You do not have access to this page, you must have an account first !
-                </h1>
-                <p className="py-6">
-                  In order to apply for the citizenship, you must have an account and sign in. If
-                  you do not have an account, you can create one by clicking the button below.
-                </p>
+        <div className="hero min-h-screen bg-error">
+          <div className="hero-content flex-col lg:flex-row-reverse">
+            <div>
+              <h1 className="text-5xl font-bold">
+                You do not have access to this page, you must have an account first !
+              </h1>
+              <p className="py-6">
+                In order to apply for the citizenship, you must have an account and sign in. If you
+                do not have an account, you can create one by clicking the button below.
+              </p>
 
-                <button className="btn-secondary btn mt-10" onClick={handleSignUpClick}>
-                  Sign up
-                </button>
-              </div>
+              <button className="btn-secondary btn mt-10" onClick={handleSignUpClick}>
+                Sign up
+              </button>
             </div>
           </div>
-        </>
+        </div>
       )}
       <Footer />
       <Spinner isOpen={isSpinnerOpen} />

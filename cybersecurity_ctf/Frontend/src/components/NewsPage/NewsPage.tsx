@@ -66,14 +66,15 @@ const NewsPage: FC<NewsPageProps> = () => {
   }, []);
 
   useEffect(() => {
-    const getAdminStatus = async () => {
-      const adminStatus = await isAdminRole();
-      setAdmin(adminStatus);
-    };
     if (isLoggedIn()) {
       getAdminStatus();
     }
   }, []);
+
+  const getAdminStatus = async () => {
+    const adminStatus = await isAdminRole();
+    setAdmin(adminStatus);
+  };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
