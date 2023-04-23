@@ -1,0 +1,54 @@
+version: '3.9'
+
+services:
+  db:
+    container_name: ramuna_db
+    image: postgres:15.2-alpine
+    restart: always
+    env_file:
+      - Backend/.env
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    volumes:
+      - db:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: ramuna_backend
+    restart: always
+    ports:
+      - ${BACKEND_PORT}:${BACKEND_PORT}
+    env_file:
+      - Backend/.env
+    depends_on:
+      - db
+    networks:
+      default:
+        ipv4_address: 172.20.0.6
+
+  frontend:
+    container_name: ramuna_frontend
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - ${PORT}:${PORT}
+    networks:
+      default:
+        ipv4_address: 172.20.0.5
+
+volumes:
+  db:
+    driver: local
+
+networks:
+  default:
+    external: true
+    name: internal-network-ramuna

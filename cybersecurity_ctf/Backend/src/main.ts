@@ -5,7 +5,7 @@ import { GlobalExceptionFilter } from './common/global-exception.filter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalFilters(new GlobalExceptionFilter());
-  const port = process.env.PORT;
+  const port = process.env.BACKEND_PORT;
   app.enableCors();
   await app.listen(port);
   console.log(
