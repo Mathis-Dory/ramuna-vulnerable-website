@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Request } from '../../../typeorm';
 import { RequestStatus } from '../../request.enums';
-import { DocumentDto } from '../../../documents/dto/documents.dtos';
 import { DocumentsService } from '../../../documents/services/documents/documents.service';
 import { EditRequestDto } from '../../dto/requests.dtos';
 import { DocumentStatus } from '../../../documents/documents.enum';
@@ -99,24 +98,13 @@ export class RequestsService {
   }
 
   async validateRawFiles(
-    files: DocumentDto[],
+    file: Express.Multer.File,
     documentsService: DocumentsService,
   ) {
-    const checkedDocuments = [];
-    for (const document of files) {
-      try {
-        const checkedDocument = await documentsService.checkDocument(document);
-        checkedDocuments.push(checkedDocument);
-      } catch (err) {
-        throw err;
-      }
-    }
-    if (checkedDocuments.length === files.length) {
-      return checkedDocuments;
-    } else {
-      throw new Error(
-        'Some documents are not valid, pleaase upload them again',
-      );
+    try {
+      return await documentsService.checkDocument(document);
+    } catch (err) {
+      throw new Error('Document is not valid, please upload it again');
     }
   }
 

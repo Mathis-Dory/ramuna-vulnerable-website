@@ -10,16 +10,13 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { RequestsService } from '../../../requests/services/requests/requests.service';
+import { RequestsService } from '../../services/requests/requests.service';
 import { UsersService } from '../../../users/services/users/users.service';
 import { Roles } from '../../../common/role.decorator';
 import { Role } from '../../../common/role.enum';
-import {
-  EditRequestDto,
-  SubmitRequestDto,
-} from '../../../requests/dto/requests.dtos';
+import { EditRequestDto, SubmitRequestDto } from '../../dto/requests.dtos';
 import { DocumentsService } from '../../../documents/services/documents/documents.service';
-import { RequestStatus } from '../../../requests/request.enums';
+import { RequestStatus } from '../../request.enums';
 
 @Controller('requests')
 export class RequestsController {
@@ -32,7 +29,7 @@ export class RequestsController {
   @Roles(Role.User)
   @Post('/postRequest')
   @UsePipes(ValidationPipe)
-  async postNews(
+  async postRequests(
     @Req() req,
     @Res() response,
     @Body() submitRequestDto: SubmitRequestDto,
@@ -46,11 +43,11 @@ export class RequestsController {
       let checkedData = [];
       try {
         checkedData = await this.requestsService.validateRawFiles(
-          submitRequestDto.documents,
+          submitRequestDto.pdf,
           this.documentsService,
         );
         const savedRequest = await this.requestsService.saveRequest({
-          data: submitRequestDto.data,
+          data: submitRequestDto.image,
           userId,
         });
         await this.documentsService.saveDocuments(checkedData, savedRequest);
@@ -58,7 +55,7 @@ export class RequestsController {
           status: 'OK',
           userId,
           documents: checkedData,
-          additionalInfo: submitRequestDto.data,
+          additionalInfo: submitRequestDto,
         });
       } catch (err) {
         throw err;

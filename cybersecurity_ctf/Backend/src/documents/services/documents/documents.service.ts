@@ -4,7 +4,7 @@ import {
   DocumentTypes,
   DocumentType,
   DocumentStatus,
-} from '../../../documents/documents.enum';
+} from '../../documents.enum';
 import { Document } from '../../../typeorm';
 import { Repository } from 'typeorm';
 

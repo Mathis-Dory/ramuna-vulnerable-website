@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
   HttpStatus,
   Param,
   ParseIntPipe,
@@ -24,8 +25,16 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class NewsController {
   constructor(private readonly newsService: NewsService) {}
   @Get('/allNews')
-  getAllNews() {
-    return this.newsService.getAllNews();
+  async getAllNews() {
+    const news = this.newsService.getAllNews();
+    if ((await news) != false) {
+      return news;
+    } else {
+      throw new HttpException(
+        'No news found in the database.',
+        HttpStatus.NOT_FOUND,
+      );
+    }
   }
 
   @Get('id/:id')

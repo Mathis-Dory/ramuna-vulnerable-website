@@ -39,7 +39,7 @@ const FrontPage: FC<FrontPageProps> = () => {
             {isLoggedIn() ? (
               <></>
             ) : (
-              <button className="btn-primary btn mt-10" onClick={handleSignUpClick}>
+              <button className="btn-primaryLight btn mt-10" onClick={handleSignUpClick}>
                 Sign up
               </button>
             )}

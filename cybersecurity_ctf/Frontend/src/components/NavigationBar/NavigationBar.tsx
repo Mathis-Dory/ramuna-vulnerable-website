@@ -24,6 +24,10 @@ const NavigationBar: FC<NavigationBarProps> = () => {
   const handleContactClick = () => {
     history("/contact");
   };
+
+  const handleRegistrationClick = () => {
+    history("/citizenship");
+  };
   const handleNewsClick = () => {
     history("/news");
   };
@@ -63,8 +67,8 @@ const NavigationBar: FC<NavigationBarProps> = () => {
             <li onClick={handleNewsClick}>
               <span>News</span>
             </li>
-            <li tabIndex={0}>
-              <span className="justify-between">Registration</span>
+            <li tabIndex={0} onClick={handleRegistrationClick}>
+              <span className="justify-between">Citizenship request</span>
             </li>
             <li onClick={handleContactClick}>
               <span>Contact</span>
@@ -80,8 +84,8 @@ const NavigationBar: FC<NavigationBarProps> = () => {
           <li onClick={handleNewsClick}>
             <span>News</span>
           </li>
-          <li tabIndex={0}>
-            <span>Citizenship registration</span>
+          <li tabIndex={0} onClick={handleRegistrationClick}>
+            <span>Citizenship request</span>
           </li>
           <li onClick={handleContactClick}>
             <span>Contact</span>
