@@ -1,17 +1,15 @@
-# Use an official Node.js runtime as a parent image
-FROM node:latest
 
-# Set the working directory in the container
-WORKDIR /app
 
-# Copy the package.json and package-lock.json files to the container
+FROM node:lts-alpine as production
+
+WORKDIR /usr/src/app
+
+RUN npm i -g @nestjs/cli
+
 COPY package*.json ./
 
-# Install the dependencies
 RUN npm install
 
-# Copy the rest of the application code to the container
 COPY . .
 
-# Start the application when the container starts
 CMD ["npm", "start"]

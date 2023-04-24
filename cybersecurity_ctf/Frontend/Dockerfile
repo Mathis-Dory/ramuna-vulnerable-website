@@ -1,14 +1,25 @@
-FROM node:latest AS build
-WORKDIR /build
+FROM node:lts-alpine AS build
 
-COPY package.json package.json
-COPY package-lock.json package-lock.json
-RUN npm ci
+WORKDIR /app
 
-COPY public/ public
-COPY src/ src
-RUN npm run build
+
+ENV PATH /app/node_modules/.bin:$PATH
+
+COPY package.json pnpm-lock.yaml ./
+RUN npm install -g pnpm && \
+    pnpm install
+
+COPY . ./
+
+RUN pnpm run build
 
 FROM httpd:2.4.49-alpine
-WORKDIR /var/www/html
-COPY --from=build /build/build/ .
+
+RUN apk update && apk add curl
+
+COPY --from=build /app/build/ /usr/local/apache2/htdocs/
+COPY .htaccess /usr/local/apache2/htdocs/
+COPY httpd.conf /usr/local/apache2/conf/httpd.conf
+
+
+
