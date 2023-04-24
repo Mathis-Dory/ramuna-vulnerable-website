@@ -1,0 +1,64 @@
+version: '3.9'
+
+services:
+  db:
+    container_name: ramuna_db
+    build:
+      context: ./Backend/database
+      dockerfile: Dockerfile
+    restart: always
+    env_file:
+      - ./Backend/.env
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks:
+      cybersecurity-network:
+        ipv4_address: 192.168.10.11
+    ports:
+      - "5432:5432"
+
+  backend:
+    container_name: ramuna_backend
+    build:
+        context: ./Backend
+        dockerfile: Dockerfile
+        target: production
+    restart: always
+    env_file:
+      - ./Backend/.env
+
+    ports:
+      - "8000:8000"
+    networks:
+        cybersecurity-network:
+            ipv4_address: 192.168.10.23
+
+  apache:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: ramuna_web
+    ports:
+      - "80:80"
+    networks:
+      cybersecurity-network:
+        ipv4_address: 192.168.10.29
+    environment:
+      - APACHE_SERVER_NAME=localhost
+      - APACHE_SERVER_ADMIN=admin@example.com
+
+
+    command: [ "httpd-foreground" ]
+
+volumes:
+  db:
+    driver: local
+
+networks:
+  cybersecurity-network:
+    name: cybersecurity-network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.10.0/24
+          gateway: 192.168.10.1
