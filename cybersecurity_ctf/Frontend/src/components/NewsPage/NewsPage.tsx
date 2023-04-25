@@ -42,6 +42,9 @@ const NewsPage: FC<NewsPageProps> = () => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [file, setFile] = useState<null | Blob>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredNews, setFilteredNews] = useState<GetNews[]>([]);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -156,6 +159,15 @@ const NewsPage: FC<NewsPageProps> = () => {
     setOpenModal(true);
   };
 
+  useEffect(() => {
+    setFilteredNews(news.filter((item) =>
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.body.toLowerCase().includes(searchQuery.toLowerCase())
+    ));
+  }, [news, searchQuery]);
+
+
+
   return (
     <div className="bg-primary">
       <NavigationBar />
@@ -178,6 +190,15 @@ const NewsPage: FC<NewsPageProps> = () => {
         }}
       >
         <h1 className="text-4xl text-secondary underline">Latest news</h1>
+        <div className="p-4">
+        <TextField
+            label="Search"
+            variant="filled"
+            className="bg-white p-4"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+        />
+        </div>
         {news.length === 0 ? (
           <h2 className="p-12 text-3xl">
             Sorry, there are no news for the moment. Come back later.
@@ -190,7 +211,7 @@ const NewsPage: FC<NewsPageProps> = () => {
               justifyContent: "center",
             }}
           >
-            {news.map((item, index) => (
+            {filteredNews.map((item, index) => (
               <Grid key={index} className="pl-6 pr-6">
                 <Card key={index} className="mt-[4rem]">
                   {item.binaryData && (

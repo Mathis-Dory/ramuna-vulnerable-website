@@ -118,7 +118,7 @@ const SignUpPage: FC<SignUpPageProps> = () => {
         progress: undefined,
         theme: "colored",
       });
-      history("/");
+      history("/signIn");
     } catch (error: any) {
       setIsSpinnerOpen(false);
       const errorServer =
