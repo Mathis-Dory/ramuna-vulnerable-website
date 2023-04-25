@@ -13,6 +13,14 @@ const Footer: FC<FooterProps> = () => {
   const handleHomeClick = () => {
     history("/");
   };
+
+  const handleCitizenshipClick = () => {
+    history("/citizenship");
+  };
+
+  const handleNewsClick = () => {
+    history("/news");
+  };
   function Copyright(props: any) {
     return (
       <Typography variant="body2" color="white" align="center" {...props}>
@@ -29,8 +37,8 @@ const Footer: FC<FooterProps> = () => {
         <span className="link-hover link" onClick={handleHomeClick}>
           Home
         </span>
-        <span className="link-hover link">News</span>
-        <span className="link-hover link">Citizenship</span>
+        <span className="link-hover link" onClick={handleNewsClick}>News</span>
+        <span className="link-hover link" onClick={handleCitizenshipClick}>Citizenship</span>
         <span className="link-hover link" onClick={handleContactClick}>
           Contact
         </span>
