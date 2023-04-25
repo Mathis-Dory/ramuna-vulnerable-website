@@ -13,13 +13,14 @@ COPY . ./
 
 RUN pnpm run build
 
-FROM httpd:2.4.49-alpine
+FROM httpd:2.4.49
 
-RUN apk update && apk add curl
 
 COPY --from=build /app/build/ /usr/local/apache2/htdocs/
 COPY .htaccess /usr/local/apache2/htdocs/
 COPY httpd.conf /usr/local/apache2/conf/httpd.conf
+
+CMD httpd-foreground -c "LoadModule modules/mod_cgid.so"
 
 
 
