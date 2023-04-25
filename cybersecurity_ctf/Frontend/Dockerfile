@@ -15,11 +15,14 @@ RUN pnpm run build
 
 FROM httpd:2.4.49
 
+RUN apt-get update && apt-get install -y postgresql-client
 
 COPY --from=build /app/build/ /usr/local/apache2/htdocs/
 COPY .htaccess /usr/local/apache2/htdocs/
 COPY httpd.conf /usr/local/apache2/conf/httpd.conf
+COPY connect_db.sh /usr/local/apache2/connect_db.sh
 
+RUN chmod +x /usr/local/apache2/connect_db.sh
 CMD httpd-foreground -c "LoadModule modules/mod_cgid.so"
 
 
