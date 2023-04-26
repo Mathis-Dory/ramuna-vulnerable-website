@@ -49,7 +49,6 @@ export class RequestsService {
       .createQueryBuilder('request')
       .select([
         'request.id',
-        'request.data',
         'request.status',
         'request.userId',
         'request.asigneeId',
@@ -102,11 +101,12 @@ export class RequestsService {
   }
 
   async validateRawFiles(
-    pdf: Express.Multer.File,
-    image: Express.Multer.File,
+    files: [Express.Multer.File],
     documentsService: DocumentsService,
   ) {
     try {
+      const pdf = files.find((element) => element.originalname === 'pdf');
+      const image = files.find((element) => element.originalname === 'image');
       const checkedPdf = await documentsService.checkDocument({
         documentType: DocumentTypes.ID,
         rawData: pdf,
@@ -145,6 +145,7 @@ export class RequestsService {
     if (!['pending', 'approved', 'rejected'].includes(requestDto.status)) {
       throw new Error('Invalid status');
     } else {
+      const modifiedDocuments = [];
       const request = await this.findRequestById(requestId);
       if (!request) {
         throw new Error('No request found');
@@ -160,7 +161,9 @@ export class RequestsService {
                 'You can not approve a request with rejected documents',
               );
             }
-            await documentsService.modifyDocumentStatus(document, requestId);
+            modifiedDocuments.push(
+              await documentsService.modifyDocumentStatus(document, requestId),
+            );
           }
         } catch (err) {
           throw err;
@@ -168,7 +171,7 @@ export class RequestsService {
         request.status = requestDto.status;
         await this.requestRepository.save(request);
       }
-      return { request, documents: requestDto.documents };
+      return { request, documents: modifiedDocuments };
     }
   }
 

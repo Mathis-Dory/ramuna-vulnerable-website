@@ -6,7 +6,6 @@ import {
   DocumentStatus,
 } from '../../documents.enum';
 import { Document } from '../../../typeorm';
-import { fileTypeFromBuffer } from '../../file-type-importer';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -30,10 +29,11 @@ export class DocumentsService {
 
   async isPdf(file: Express.Multer.File): Promise<boolean> {
     try {
+      const FileType = await import('file-type');
       // Check the first 261 bytes, as file-type requires at least this many bytes for detection
       const requiredBytesForDetection = 261;
       const buffer = file.buffer.slice(0, requiredBytesForDetection);
-      const fileTypeResult = await fileTypeFromBuffer(buffer);
+      const fileTypeResult = await FileType.fileTypeFromBuffer(buffer);
 
       if (fileTypeResult && fileTypeResult.ext === 'pdf') {
         return true;
@@ -47,10 +47,11 @@ export class DocumentsService {
 
   async isPng(file: Express.Multer.File): Promise<boolean> {
     try {
+      const FileType = await import('file-type');
       // Check the first 261 bytes, as file-type requires at least this many bytes for detection
       const requiredBytesForDetection = 261;
       const buffer = file.buffer.slice(0, requiredBytesForDetection);
-      const fileTypeResult = await fileTypeFromBuffer(buffer);
+      const fileTypeResult = await FileType.fileTypeFromBuffer(buffer);
 
       if (fileTypeResult && fileTypeResult.ext === 'png') {
         return true;
