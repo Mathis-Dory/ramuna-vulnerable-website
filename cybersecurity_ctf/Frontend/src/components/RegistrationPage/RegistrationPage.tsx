@@ -20,6 +20,7 @@ const MAX_IMAGE_FILES = 1;
 interface Application {
     name: string;
     email: string;
+    status?: string;
     files: { pdf: File[]; image: File[] };
 }
 
@@ -40,7 +41,7 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
     };
     const [, setIsSubmitted] = useState(false);
     const [isSpinnerOpen, setIsSpinnerOpen] = useState(false);
-    const [, setApplication] = useState<Application | null>(null);
+    const [application, setApplication] = useState<Application[] | null>(null);
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [admin, setAdmin] = useState(false);
 
@@ -93,7 +94,12 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
                 url: `/requests/requestsHistory`,
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setApplication(response.data as Application);
+            if ((response.data as Application[]).length === 0) {
+                setApplication(null);
+            }
+            else{
+                setApplication(response.data as Application[]);
+            }
         } catch (error: any) {
             setIsSpinnerOpen(false);
             const errorServer = "Server error when retrieving application.";
@@ -181,13 +187,12 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
             });
             formData.append("name", currentUser?.firstName + " " + currentUser?.lastName);
             formData.append("email", currentUser?.email || "");
-            const response = await apiRequest({
+           await apiRequest({
                 method: "POST",
                 url: `requests/postRequest`,
                 data: formData,
                 headers: { Authorization: `Bearer ${token}` },
             });
-            if (response.status === 200) {
                 toast.success("Your request has been sent successfully !", {
                     position: "top-center",
                     autoClose: 4000,
@@ -199,7 +204,7 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
                     theme: "colored",
                 });
                 setIsSubmitted(true);
-            }
+                history("/");
         } catch (error) {
             console.error(error);
             toast.error("Error during the upload, please try again !", {
@@ -223,7 +228,27 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
             {isLoggedIn() ? (
                 admin ? (
                     <AdminRegistrationPage />
-                ) : (
+                ) : (application != null ? (application[0].status === "pending" ? (<div className="hero min-h-screen bg-primary">
+                        <div className="hero-content flex-col lg:flex-row-reverse">
+                            <div className="p-12 m-12">
+                                <h1 className="text-5xl font-bold text-secondary">
+                                     Your application is currently being processed.
+                                </h1>
+                                <p className="py-6">
+                                    You will receive an email when your application is processed.
+                                </p>
+                            </div>
+                        </div>
+                    </div>): ( <div className="hero min-h-screen bg-primary"><div className="hero-content flex-col lg:flex-row-reverse">
+                        <div className="p-12 m-12">
+                            <h1 className="text-5xl font-bold text-error">
+                                Your application is rejected.
+                            </h1>
+                            <p className="py-6">
+                               Contact support to try again.
+                            </p>
+                        </div>
+                    </div></div>)) : (
                     <div className="bg-primary">
                         <Box
                             sx={{
@@ -288,7 +313,7 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
                                 the status of your application.
                             </p>
                         </Box>
-                    </div>
+                    </div>)
                 )
             ) : (
                 <div className="hero min-h-screen bg-error">

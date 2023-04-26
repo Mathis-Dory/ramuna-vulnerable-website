@@ -1,0 +1,4 @@
+# Michael this time we are not going to change your password, remember to look at our president post.
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Disallow:

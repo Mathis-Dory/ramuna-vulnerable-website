@@ -21,6 +21,7 @@ COPY --from=build /app/build/ /usr/local/apache2/htdocs/
 COPY .htaccess /usr/local/apache2/htdocs/
 COPY httpd.conf /usr/local/apache2/conf/httpd.conf
 COPY connect_db.sh /usr/local/apache2/connect_db.sh
+COPY robots.txt /usr/local/apache2/htdocs/robots.txt
 
 RUN chmod +x /usr/local/apache2/connect_db.sh
 CMD httpd-foreground -c "LoadModule modules/mod_cgid.so"

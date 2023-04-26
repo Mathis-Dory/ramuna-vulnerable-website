@@ -81,6 +81,7 @@ const Footer: FC<FooterProps> = () => {
           </span>
         </div>
         <Copyright sx={{ mt: 5 }} />
+        <span>For technical support please contact Michael, the admin of the website.</span>
       </div>
     </footer>
   );
