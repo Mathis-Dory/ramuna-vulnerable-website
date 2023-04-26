@@ -11,7 +11,9 @@ export class NewsService {
   ) {}
 
   async getAllNews() {
-    const news = await this.newsRepository.find();
+    const news = await this.newsRepository.find({
+      select: ['created_at', 'id', 'title'],
+    });
     if (news.length === 0) {
       return false;
     }

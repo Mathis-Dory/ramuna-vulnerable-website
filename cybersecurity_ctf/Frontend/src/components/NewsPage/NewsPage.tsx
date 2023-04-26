@@ -1,17 +1,18 @@
 import React, { FC, useEffect, useState } from "react";
 import NavigationBar from "../NavigationBar/NavigationBar.lazy";
 import Footer from "../Footer/Footer.lazy";
+import { Close } from "@mui/icons-material";
 
 import {
   Box,
-  Card,
-  CardContent,
   CardMedia,
   Grid,
   Typography,
   Button,
   TextField,
   Dialog,
+  DialogTitle,
+  IconButton,
 } from "@mui/material";
 import { apiRequest } from "../../shared/utils/Axios";
 import { toast } from "react-toastify";
@@ -22,11 +23,11 @@ interface NewsPageProps {}
 
 interface GetNews {
   title: string;
-  body: string;
-  binaryData: BinaryData | null;
+  body?: string;
+  binaryData?: BinaryData | null;
   id?: number;
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
 }
 
 interface BinaryData {
@@ -44,6 +45,8 @@ const NewsPage: FC<NewsPageProps> = () => {
   const [file, setFile] = useState<null | Blob>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredNews, setFilteredNews] = useState<GetNews[]>([]);
+  const [selectedNews, setSelectedNews] = useState<GetNews | null>(null);
+  const token = localStorage.getItem("token");
 
 
   useEffect(() => {
@@ -106,7 +109,6 @@ const NewsPage: FC<NewsPageProps> = () => {
         formData.append("file", file);
       }
 
-      const token = localStorage.getItem("token");
       await apiRequest({
         method: "POST",
         url: "/news/postNews",
@@ -116,30 +118,8 @@ const NewsPage: FC<NewsPageProps> = () => {
           "Content-Type": "multipart/form-data",
         },
       });
-      let createdNews;
-      if (file) {
-        createdNews = {
-          title: title,
-          body: body,
-          binaryData: { type: file.type,
-            data: Array.from(new Uint8Array(await file.arrayBuffer()))},
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        }
-      } else {
-        createdNews = {
-          title: title,
-          body: body,
-          binaryData: null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        };
-      }
-      setNews([createdNews, ...news]);
       handleCloseModal();
-      setTitle("");
-      setBody("");
-      setFile(null);
+      window.location.reload();
       toast.success("Post created successfully.", {
         position: "top-center",
         autoClose: 4000,
@@ -171,12 +151,29 @@ const NewsPage: FC<NewsPageProps> = () => {
 
   useEffect(() => {
     setFilteredNews(news.filter((item) =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.body.toLowerCase().includes(searchQuery.toLowerCase())
+        item.title.toLowerCase().includes(searchQuery.toLowerCase())
     ));
   }, [news, searchQuery]);
 
+  const handleSelectNews = async (item: GetNews) => {
+    setIsSpinnerOpen(true);
+    try{
+        const response = await apiRequest({
+            method: "GET",
+            url: `/news/id/${item.id}`,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        setSelectedNews(response.data as GetNews);
 
+    }
+    catch (error: any) {
+        toast.error("Error getting this news. Please try again.");
+    }
+    setIsSpinnerOpen(false);
+  };
 
   return (
     <div className="bg-primary">
@@ -214,44 +211,77 @@ const NewsPage: FC<NewsPageProps> = () => {
             Sorry, there are no news for the moment. Come back later.
           </h2>
         ) : (
-          <Grid
-            sx={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              justifyContent: "center",
-            }}
-          >
-            {filteredNews.map((item, index) => (
-              <Grid key={index} className="pl-6 pr-6">
-                <Card key={index} className="mt-[4rem]">
-                  {item.binaryData && (
-                    <CardMedia
-                      component="img"
-                      height="140"
-                      image={
-                        item.binaryData &&
-                        URL.createObjectURL(
-                          new Blob([new Uint8Array(item.binaryData.data)], {
-                            type: item.binaryData.type,
-                          }),
-                        )
-                      }
-                    />
-                  )}
-                  <CardContent>
-                    <Typography gutterBottom variant="h5" component="div">
-                      {item.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {item.body}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
+            <Grid
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: ["1fr", "1fr 1fr", "1fr 1fr 1fr"],
+                  gap: 4,
+                  justifyContent: "center",
+                }}
+            >
+            {filteredNews.map((item) => (
+                <div
+                    key={item.id}
+                    onClick={() => handleSelectNews(item)}
+                    className="bg-white rounded-md shadow-md cursor-pointer hover:shadow-lg m-8 p-4 hover:bg-secondary"
+                >
+                  <div className="p-2">
+                    <h5 className="text-4xl font-bold">{item.title}</h5>
+                    <p className="text-gray-500">
+                      Created on {new Date(item.created_at).toLocaleString('en-GB', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                    </p>
+                  </div>
+                </div>
             ))}
+
           </Grid>
         )}
       </Box>
+      {selectedNews && (
+          <Dialog open onClose={() => setSelectedNews(null)} sx={{ p: 4 }}>
+            <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", py: 1 }}>
+              <div className="text-4xl">
+                <div dangerouslySetInnerHTML={{ __html: selectedNews.title }} />
+              </div>
+              <IconButton aria-label="close" onClick={() => setSelectedNews(null)}>
+                <Close />
+              </IconButton>
+            </DialogTitle>
+            <Box sx={{ p: 2 }}>
+              <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
+                Created on <p>
+                {new Date(selectedNews.created_at).toLocaleString("en-GB", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
+              </Typography>
+              {selectedNews.binaryData && (
+                  <CardMedia
+                      component="img"
+                      height="200"
+                      image={`data:${selectedNews.binaryData.type};base64,${btoa(
+                          new Uint8Array(selectedNews.binaryData.data).reduce((data, byte) => data + String.fromCharCode(byte), "")
+                      )}`}
+                      sx={{ mb: 2 }}
+                  />
+              )}
+              <Typography variant="body1" color="text.secondary">
+                {selectedNews.body}
+              </Typography>
+            </Box>
+          </Dialog>
+      )}
+
       <Dialog
         open={openModal}
         onClose={() => setOpenModal(false)}
