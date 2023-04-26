@@ -30,7 +30,7 @@ export class EditRequestDto {
 
   @IsArray()
   @ArrayNotEmpty()
-  @ArrayMinSize(4)
-  @ArrayMaxSize(4)
+  @ArrayMinSize(2)
+  @ArrayMaxSize(2)
   documents: DocumentDto[];
 }

@@ -172,12 +172,12 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
 
             // Loop through the PDF files
             formValues.files.pdf.slice(0, MAX_PDF_FILES).forEach((file) => {
-                formData.append("pdf", file);
+                formData.append('files[]', file, 'pdf');
             });
 
             // Loop through the image files
             formValues.files.image.slice(0, MAX_IMAGE_FILES).forEach((file) => {
-                formData.append("image", file);
+                formData.append('files[]', file, 'image');
             });
             formData.append("name", currentUser?.firstName + " " + currentUser?.lastName);
             formData.append("email", currentUser?.email || "");

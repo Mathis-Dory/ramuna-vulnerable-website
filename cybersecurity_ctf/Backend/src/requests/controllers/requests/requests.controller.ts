@@ -8,6 +8,8 @@ import {
   Put,
   Req,
   Res,
+  UploadedFiles,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -18,6 +20,7 @@ import { Role } from '../../../common/role.enum';
 import { EditRequestDto, SubmitRequestDto } from '../../dto/requests.dtos';
 import { DocumentsService } from '../../../documents/services/documents/documents.service';
 import { RequestStatus } from '../../request.enums';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('requests')
 export class RequestsController {
@@ -29,11 +32,13 @@ export class RequestsController {
 
   @Roles(Role.User)
   @Post('/postRequest')
-  @UsePipes(ValidationPipe)
+  // @UsePipes(ValidationPipe)
+  @UseInterceptors(FilesInterceptor('files[]', 20))
   async postRequests(
     @Req() req,
     @Res() response,
     @Body() submitRequestDto: SubmitRequestDto,
+    @UploadedFiles() files,
   ) {
     const userId = await this.userService.getUserIdFromJwt(
       req['headers']['authorization'],
@@ -44,8 +49,7 @@ export class RequestsController {
       let checkedData = [];
       try {
         checkedData = await this.requestsService.validateRawFiles(
-          submitRequestDto.pdf,
-          submitRequestDto.image,
+          files,
           this.documentsService,
         );
         const savedRequest = await this.requestsService.saveRequest({

@@ -17,9 +17,15 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './common/role.guard';
 import { CronJobUtil } from './utils/cron/cron.service';
+import { MulterModule } from '@nestjs/platform-express';
+import * as multer from 'multer';
 
 @Module({
   imports: [
+    MulterModule.register({
+      storage: multer.memoryStorage(),
+    }),
+    // ..
     ScheduleModule.forRoot(),
     UsersModule,
     ConfigModule.forRoot({ isGlobal: true }),
