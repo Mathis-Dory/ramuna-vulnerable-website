@@ -17,11 +17,6 @@ export class Request {
   })
   id: number;
 
-  @Column('bytea', { nullable: true })
-  pdf: Buffer;
-  @Column('bytea', { nullable: true })
-  image: Buffer;
-
   @Column({
     nullable: false,
     default: '',

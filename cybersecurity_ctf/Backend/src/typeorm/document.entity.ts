@@ -35,11 +35,8 @@ export class Document {
   })
   status: string;
 
-  @Column('jsonb', {
-    nullable: false,
-    default: {},
-  })
-  rawData: string;
+  @Column('bytea', { nullable: true })
+  rawData: Buffer;
 
   @Column({ name: 'requestId' })
   requestId: number;
