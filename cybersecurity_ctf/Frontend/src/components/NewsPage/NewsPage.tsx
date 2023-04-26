@@ -23,8 +23,8 @@ interface NewsPageProps {}
 interface GetNews {
   title: string;
   body: string;
-  binaryData?: BinaryData | null;
-  id: number;
+  binaryData: BinaryData | null;
+  id?: number;
   created_at: string;
   updated_at: string;
 }
@@ -116,15 +116,25 @@ const NewsPage: FC<NewsPageProps> = () => {
           "Content-Type": "multipart/form-data",
         },
       });
-
-      const createdNews = {
-        title: title,
-        body: body,
-        binaryData: null,
-        id: news.length + 1,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
+      let createdNews;
+      if (file) {
+        createdNews = {
+          title: title,
+          body: body,
+          binaryData: { type: file.type,
+            data: Array.from(new Uint8Array(await file.arrayBuffer()))},
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }
+      } else {
+        createdNews = {
+          title: title,
+          body: body,
+          binaryData: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+      }
       setNews([createdNews, ...news]);
       handleCloseModal();
       setTitle("");
