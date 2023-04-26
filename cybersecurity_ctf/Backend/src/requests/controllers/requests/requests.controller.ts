@@ -107,13 +107,11 @@ export class RequestsController {
       .status(HttpStatus.OK)
       .json(await this.requestsService.getAllAssignedRequests(userId, true));
   }
-
-  @Roles(Role.Admin)
   @Get('internal/test')
   async renderInternalPage(@Req() req, @Res() response) {
     return response.status(HttpStatus.OK).json({
       message:
-        'Michael, this page is for testing purposes only. DO NOT PUSH IT INTO PRODUCTION. this page serves as a cookie tester. Put it and test the same endpoint. FIX THE BUGS YOU FOUND !! if any :)',
+        'Michael, this page is for testing purposes only. DO NOT PUSH IT INTO PRODUCTION. this page serves as a cookie tester. Put it and test the same endpoint. FIX THE BUGS YOU FOUND !! if any :) DO NOT FORGET TO USE THE ADMIN ROLE !!!',
     });
   }
 
