@@ -6,6 +6,7 @@ import {
   DocumentStatus,
 } from '../../documents.enum';
 import { Document } from '../../../typeorm';
+import { fileTypeFromBuffer } from '../../file-type-importer';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -27,15 +28,44 @@ export class DocumentsService {
     }
   }
 
+  async isPdf(file: Express.Multer.File): Promise<boolean> {
+    try {
+      // Check the first 261 bytes, as file-type requires at least this many bytes for detection
+      const requiredBytesForDetection = 261;
+      const buffer = file.buffer.slice(0, requiredBytesForDetection);
+      const fileTypeResult = await fileTypeFromBuffer(buffer);
+
+      if (fileTypeResult && fileTypeResult.ext === 'pdf') {
+        return true;
+      }
+    } catch (error) {
+      console.error('Error detecting file type:', error);
+    }
+
+    return false;
+  }
+
+  async isPng(file: Express.Multer.File): Promise<boolean> {
+    try {
+      // Check the first 261 bytes, as file-type requires at least this many bytes for detection
+      const requiredBytesForDetection = 261;
+      const buffer = file.buffer.slice(0, requiredBytesForDetection);
+      const fileTypeResult = await fileTypeFromBuffer(buffer);
+
+      if (fileTypeResult && fileTypeResult.ext === 'png') {
+        return true;
+      }
+    } catch (error) {
+      console.error('Error detecting file type:', error);
+    }
+
+    return false;
+  }
+
   async checkDocument(document: any) {
     switch (document.documentType) {
       case DocumentTypes.ID:
-      case DocumentTypes.LETTER1:
-      case DocumentTypes.LETTER2:
-        if (
-          document.rawData.slice(0, 5).toString() === '%PDF-' &&
-          document.rawData.slice(-5).toString() === '%%EOF'
-        ) {
+        if (await this.isPdf(document.rawData)) {
           return { ...document, type: DocumentType.DOCUMENT };
         } else {
           throw new HttpException(
@@ -44,7 +74,7 @@ export class DocumentsService {
           );
         }
       case DocumentTypes.SELFIE:
-        if (document.rawData.includes('/^data:image/png;base64,/')) {
+        if (await this.isPng(document.rawData)) {
           return { ...document, type: DocumentType.PICTURE };
         } else {
           throw new HttpException(

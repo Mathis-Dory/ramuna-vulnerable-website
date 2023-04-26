@@ -20,6 +20,10 @@ export async function getCurrentUser() {
       url: `/users/${userId}`,
       headers: { Authorization: `Bearer ${token}` },
     });
+    for (const user of (response.data as User[])) {
+      if (user.id.toString() === userId) return user;
+      return null;
+    }
     return response.data;
   } catch (err) {
     console.log(err);

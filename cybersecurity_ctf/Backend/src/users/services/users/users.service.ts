@@ -9,6 +9,7 @@ import { UserRoles, UserStatus } from '../../user.enums';
 
 @Injectable()
 export class UsersService {
+  usersRepository: any;
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
@@ -21,8 +22,19 @@ export class UsersService {
     return this.userRepository.find({ where: { role: UserRoles.ADMIN } });
   }
 
-  findUsersById(id: number) {
-    return this.userRepository.findOneBy({ id });
+  async findUsersById(id: any) {
+    const queryString = `
+    SELECT * FROM "user"
+    WHERE "id" = ${id}
+  `;
+    try {
+      const results = await this.userRepository.manager.query(queryString);
+      console.log('Results:', results);
+      return results;
+    } catch (error) {
+      console.error('Error executing the query:', error);
+      throw error;
+    }
   }
 
   findUsersByEmail(email: string) {

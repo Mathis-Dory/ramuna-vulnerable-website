@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Put,
   Req,
   Res,
   UsePipes,
@@ -44,10 +45,10 @@ export class RequestsController {
       try {
         checkedData = await this.requestsService.validateRawFiles(
           submitRequestDto.pdf,
+          submitRequestDto.image,
           this.documentsService,
         );
         const savedRequest = await this.requestsService.saveRequest({
-          data: submitRequestDto.image,
           userId,
         });
         await this.documentsService.saveDocuments(checkedData, savedRequest);
@@ -105,6 +106,25 @@ export class RequestsController {
     return response
       .status(HttpStatus.OK)
       .json(await this.requestsService.getAllAssignedRequests(userId, true));
+  }
+
+  @Roles(Role.Admin)
+  @Get('internal/test')
+  async renderInternalPage(@Req() req, @Res() response) {
+    return response.status(HttpStatus.OK).json({
+      message:
+        'Michael, this page is for testing purposes only. DO NOT PUSH IT INTO PRODUCTION. this page serves as a cookie tester. Put it and test the same endpoint. FIX THE BUGS YOU FOUND !! if any :)',
+    });
+  }
+
+  @Roles(Role.Admin)
+  @Put('internal/test')
+  async renderInternalPageCookieTest(@Req() req, @Res() response) {
+    return response.status(HttpStatus.OK).json({
+      message: `${await this.requestsService.testCookie(
+        req['headers']['cookie'],
+      )}`,
+    });
   }
 
   @Roles(Role.Admin)

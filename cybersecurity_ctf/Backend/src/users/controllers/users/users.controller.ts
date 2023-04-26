@@ -4,7 +4,6 @@ import {
   Get,
   HttpStatus,
   Param,
-  ParseIntPipe,
   Post,
   Res,
   UsePipes,
@@ -29,7 +28,7 @@ export class UsersController {
   }
 
   @Get('/:id')
-  findUsersById(@Param('id', ParseIntPipe) id: number) {
+  findUsersById(@Param('id') id: number) {
     return this.userService.findUsersById(id);
   }
 

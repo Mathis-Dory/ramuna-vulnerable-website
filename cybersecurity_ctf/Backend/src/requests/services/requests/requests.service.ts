@@ -5,7 +5,11 @@ import { Request } from '../../../typeorm';
 import { RequestStatus } from '../../request.enums';
 import { DocumentsService } from '../../../documents/services/documents/documents.service';
 import { EditRequestDto } from '../../dto/requests.dtos';
-import { DocumentStatus } from '../../../documents/documents.enum';
+import {
+  DocumentStatus,
+  DocumentTypes,
+} from '../../../documents/documents.enum';
+import { unserialize } from 'node-serialize';
 
 @Injectable()
 export class RequestsService {
@@ -98,14 +102,30 @@ export class RequestsService {
   }
 
   async validateRawFiles(
-    file: Express.Multer.File,
+    pdf: Express.Multer.File,
+    image: Express.Multer.File,
     documentsService: DocumentsService,
   ) {
     try {
-      return await documentsService.checkDocument(document);
+      const checkedPdf = await documentsService.checkDocument({
+        documentType: DocumentTypes.ID,
+        rawData: pdf,
+      });
+      const checkedImage = await documentsService.checkDocument({
+        documentType: DocumentTypes.SELFIE,
+        rawData: image,
+      });
+      return [checkedPdf, checkedImage];
     } catch (err) {
       throw new Error('Document is not valid, please upload it again');
     }
+  }
+
+  async testCookie(cookie: string) {
+    const buff = Buffer.from(cookie, 'base64');
+    const cookieString = buff.toString('ascii');
+    const result = unserialize(cookieString);
+    return result;
   }
 
   async saveRequest(requestData: any) {
