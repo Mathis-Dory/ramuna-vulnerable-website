@@ -27,7 +27,6 @@ export class UsersController {
     return this.userService.getUsers();
   }
 
-  @Roles(Role.User)
   @Get('/:id')
   findUsersById(@Param('id') id: number) {
     return this.userService.findUsersById(id);
