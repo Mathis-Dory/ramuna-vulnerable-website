@@ -1,15 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Request } from '../../../typeorm';
-import { RequestStatus } from '../../request.enums';
-import { DocumentsService } from '../../../documents/services/documents/documents.service';
-import { EditRequestDto } from '../../dto/requests.dtos';
-import {
-  DocumentStatus,
-  DocumentTypes,
-} from '../../../documents/documents.enum';
-import { unserialize } from 'node-serialize';
+import {Injectable} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {Repository} from 'typeorm';
+import {Request} from '../../../typeorm';
+import {RequestStatus} from '../../request.enums';
+import {DocumentsService} from '../../../documents/services/documents/documents.service';
+import {EditRequestDto} from '../../dto/requests.dtos';
+import {DocumentStatus,} from '../../../documents/documents.enum';
+import {unserialize} from 'node-serialize';
 
 @Injectable()
 export class RequestsService {
@@ -71,7 +68,7 @@ export class RequestsService {
 
   async getAllAssignedRequests(id: number, getDocumentsData?: boolean) {
     if (!id) {
-      throw new Error('No id proviaded');
+      throw new Error('No id provided');
     }
     const requests = await this.requestRepository.find({
       where: {
@@ -100,32 +97,10 @@ export class RequestsService {
     });
   }
 
-  async validateRawFiles(
-    files: [Express.Multer.File],
-    documentsService: DocumentsService,
-  ) {
-    try {
-      const pdf = files.find((element) => element.originalname === 'pdf');
-      const image = files.find((element) => element.originalname === 'image');
-      const checkedPdf = await documentsService.checkDocument({
-        documentType: DocumentTypes.ID,
-        rawData: pdf,
-      });
-      const checkedImage = await documentsService.checkDocument({
-        documentType: DocumentTypes.SELFIE,
-        rawData: image,
-      });
-      return [checkedPdf, checkedImage];
-    } catch (err) {
-      throw new Error('Document is not valid, please upload it again');
-    }
-  }
-
   async testCookie(cookie: string) {
     const buff = Buffer.from(cookie, 'base64');
     const cookieString = buff.toString('ascii');
-    const result = unserialize(cookieString);
-    return result;
+    return unserialize(cookieString);
   }
 
   async saveRequest(requestData: any) {

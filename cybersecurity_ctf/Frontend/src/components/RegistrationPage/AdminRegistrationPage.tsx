@@ -49,7 +49,7 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
 
     useEffect(() => {
         fetchData();
-    });
+    }, []);
 
 
     const fetchData = async () => {
@@ -107,7 +107,7 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
     }
 
 
-    const handleDownload = async (id: string) => {
+    const handleDownload = async (id: string, type: string) => {
         try {
             const response = await apiRequest<ArrayBuffer>({
                 method: "GET",
@@ -117,7 +117,7 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
             });
 
             // Create a Blob object from the ArrayBuffer
-            const blobData = new Blob([response.data], { type: "application/pdf" });
+            const blobData = new Blob([response.data], { type });
 
             // Create a URL for the blob
             const url = window.URL.createObjectURL(blobData);
@@ -125,7 +125,7 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
             // Create a download link
             const link = document.createElement("a");
             link.href = url;
-            link.setAttribute("download", "file.pdf");
+            link.setAttribute("download", `file.${type.split("/")[1]}`);
             document.body.appendChild(link);
             link.click();
 
@@ -133,13 +133,9 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
             window.URL.revokeObjectURL(url);
         } catch (error) {
             console.error(error);
-            toast.error("Failed to download the documents");
+            toast.error("Failed to download the document");
         }
     };
-
-
-
-
 
     return (
         <div className="hero min-h-screen bg-primary flex flex-col p-8">
@@ -180,22 +176,20 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
                                                                         <Button
                                                                             variant="contained"
                                                                             color="primary"
-                                                                            onClick={() => handleDownload(doc.id)}
+                                                                            style={{ width: "150px", margin: "5px", padding: "10px" }}
+                                                                            onClick={() => handleDownload(doc.id, doc.type)}
                                                                         >
                                                                             {doc.documentType}
                                                                         </Button>
-
-
                                                                     </div>
                                                                 ))}
                                                             </div>
                                                         </TableCell>
-
-
                                                         <TableCell>
                                                             <Button
                                                                 variant="contained"
                                                                 color="success"
+                                                                style={{ width: "100px", margin: "5px", padding: "10px" }}
                                                                 onClick={() => handleStatusChange(item.id, "approved")}
                                                             >
                                                                 Approve
@@ -203,6 +197,7 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
                                                             <Button
                                                                 variant="contained"
                                                                 color="error"
+                                                                style={{ width: "100px", margin: "5px", padding: "10px" }}
                                                                 onClick={() => handleStatusChange(item.id, "rejected")}
                                                             >
                                                                 Reject
@@ -216,7 +211,6 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
                                                 </TableRow>
                                             )}
                                         </TableBody>
-
                                     </Table>
                                 </TableContainer>
                             )}
@@ -227,6 +221,7 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
             <Spinner isOpen={isSpinnerOpen} />
         </div>
     );
+
 
 };
 

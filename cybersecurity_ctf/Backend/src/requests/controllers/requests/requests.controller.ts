@@ -20,7 +20,7 @@ import { Role } from '../../../common/role.enum';
 import { EditRequestDto, SubmitRequestDto } from '../../dto/requests.dtos';
 import { DocumentsService } from '../../../documents/services/documents/documents.service';
 import { RequestStatus } from '../../request.enums';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('requests')
 export class RequestsController {
@@ -33,7 +33,7 @@ export class RequestsController {
   @Roles(Role.User)
   @Post('/postRequest')
   // @UsePipes(ValidationPipe)
-  @UseInterceptors(FilesInterceptor('files[]', 20))
+  @UseInterceptors(AnyFilesInterceptor())
   async postRequests(
     @Req() req,
     @Res() response,
@@ -46,20 +46,19 @@ export class RequestsController {
     const existingRequest =
       await this.requestsService.findActiveRequestByUserId(userId);
     if (!existingRequest) {
-      let checkedData = [];
       try {
-        checkedData = await this.requestsService.validateRawFiles(
-          files,
-          this.documentsService,
-        );
         const savedRequest = await this.requestsService.saveRequest({
           userId,
         });
-        await this.documentsService.saveDocuments(checkedData, savedRequest);
+        await this.documentsService.saveDocuments(
+          files[0],
+          files[1],
+          savedRequest,
+        );
         return response.status(HttpStatus.CREATED).json({
           status: 'OK',
           userId,
-          documents: checkedData,
+          documents: files,
           additionalInfo: submitRequestDto,
         });
       } catch (err) {
