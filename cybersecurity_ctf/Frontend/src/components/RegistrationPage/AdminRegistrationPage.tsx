@@ -102,8 +102,26 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
             return {email: "undefined", user: "undefined"};
         }
     }
-    const handleStatusChange = (id: string, status: string) => {
-        // logic to update the status of the request with the given id
+    const handleStatusChange = async (id: string, status: string) => {
+        setIsSpinnerOpen(true);
+        try {
+            await apiRequest({
+                method: "PUT",
+                url: `/requests/editRequestStatus/id/${id}`,
+                headers: { Authorization: `Bearer ${token}` },
+                data: { "status":status },
+
+            });
+            window.location.reload();
+            const successMessage = "The request has been updated successfully.";
+            toast.success(successMessage);
+        } catch (err) {
+            console.log("error", err);
+            const errorServer = "Not able to update this request.";
+            toast.error(errorServer);
+            setIsSpinnerOpen(false);
+        }
+        setIsSpinnerOpen(false);
     }
 
 
@@ -137,6 +155,23 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
         }
     };
 
+    const sortedApplications = applications.sort((a, b) => {
+        if (a.status === b.status) {
+            return +a.id - +b.id;
+        } else if (a.status === "pending") {
+            return -1;
+        } else if (b.status === "pending") {
+            return 1;
+        } else if (a.status === "rejected") {
+            return -1;
+        } else if (b.status === "rejected") {
+            return 1;
+        } else {
+            return -1;
+        }
+    });
+
+
     return (
         <div className="hero min-h-screen bg-primary flex flex-col p-8">
             <h1 className="text-4xl text-secondary underline">Admin panel</h1>
@@ -153,6 +188,7 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
                                     <Table>
                                         <TableHead>
                                             <TableRow>
+                                                <TableCell></TableCell>
                                                 <TableCell>ID</TableCell>
                                                 <TableCell>User</TableCell>
                                                 <TableCell>Email</TableCell>
@@ -163,12 +199,19 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
                                         </TableHead>
                                         <TableBody>
                                             {applications ? (
-                                                applications.map((item) => (
+                                                sortedApplications.map((item) => (
                                                     <TableRow key={item.id}>
+                                                        <TableCell>
+                                                            <div
+                                                                className={`w-2 h-12 rounded mr-2 ${item.status === "approved" ? "bg-green-500" : item.status === "rejected" ? "bg-red-500" : "bg-orange-500"}`}
+                                                            ></div>
+                                                        </TableCell>
                                                         <TableCell>{item.id}</TableCell>
                                                         <TableCell>{item.user}</TableCell>
                                                         <TableCell>{item.email}</TableCell>
-                                                        <TableCell>{item.status}</TableCell>
+                                                        <TableCell>
+                                                            {item.status}
+                                                        </TableCell>
                                                         <TableCell>
                                                             <div>
                                                                 {item.documents.map((doc) => (
@@ -186,23 +229,46 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
                                                             </div>
                                                         </TableCell>
                                                         <TableCell>
-                                                            <Button
-                                                                variant="contained"
-                                                                color="success"
-                                                                style={{ width: "100px", margin: "5px", padding: "10px" }}
-                                                                onClick={() => handleStatusChange(item.id, "approved")}
-                                                            >
-                                                                Approve
-                                                            </Button>
-                                                            <Button
-                                                                variant="contained"
-                                                                color="error"
-                                                                style={{ width: "100px", margin: "5px", padding: "10px" }}
-                                                                onClick={() => handleStatusChange(item.id, "rejected")}
-                                                            >
-                                                                Reject
-                                                            </Button>
+                                                            {item.status === "approved" ? (
+                                                                <Button
+                                                                    variant="contained"
+                                                                    color="error"
+                                                                    style={{ width: "100px", margin: "5px", padding: "10px" }}
+                                                                    onClick={() => handleStatusChange(item.id, "rejected")}
+                                                                >
+                                                                    Reject
+                                                                </Button>
+                                                            ) : item.status === "pending" ? (
+                                                                <>
+                                                                    <Button
+                                                                        variant="contained"
+                                                                        color="success"
+                                                                        style={{ width: "100px", margin: "5px", padding: "10px" }}
+                                                                        onClick={() => handleStatusChange(item.id, "approved")}
+                                                                    >
+                                                                        Approve
+                                                                    </Button>
+                                                                    <Button
+                                                                        variant="contained"
+                                                                        color="error"
+                                                                        style={{ width: "100px", margin: "5px", padding: "10px" }}
+                                                                        onClick={() => handleStatusChange(item.id, "rejected")}
+                                                                    >
+                                                                        Reject
+                                                                    </Button>
+                                                                </>
+                                                            ) : (
+                                                                <Button
+                                                                    variant="contained"
+                                                                    color="success"
+                                                                    style={{ width: "100px", margin: "5px", padding: "10px" }}
+                                                                    onClick={() => handleStatusChange(item.id, "approved")}
+                                                                >
+                                                                    Approve
+                                                                </Button>
+                                                            )}
                                                         </TableCell>
+
                                                     </TableRow>
                                                 ))
                                             ) : (

@@ -129,7 +129,7 @@ export class RequestsController {
   }
 
   @Roles(Role.Admin)
-  @Post('/editRequestStatus/id/:id')
+  @Put('/editRequestStatus/id/:id')
   @UsePipes(ValidationPipe)
   async editNews(
     @Res() response,
@@ -143,9 +143,20 @@ export class RequestsController {
         message: 'No such requests found in the database.',
       });
     } else {
-      if (existingRequest.status === RequestStatus.APPROVED) {
+      if (
+        existingRequest.status === RequestStatus.APPROVED &&
+        editRequestDto.status === 'approved'
+      ) {
         return response.status(HttpStatus.CONFLICT).json({
           message: 'This request is already approved',
+        });
+      }
+      if (
+        existingRequest.status === RequestStatus.REJECTED &&
+        editRequestDto.status === 'rejected'
+      ) {
+        return response.status(HttpStatus.CONFLICT).json({
+          message: 'This request is already rejected',
         });
       }
       const userId = await this.userService.getUserIdFromJwt(

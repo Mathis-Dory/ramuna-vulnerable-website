@@ -1,12 +1,11 @@
-import {Injectable} from '@nestjs/common';
-import {InjectRepository} from '@nestjs/typeorm';
-import {Repository} from 'typeorm';
-import {Request} from '../../../typeorm';
-import {RequestStatus} from '../../request.enums';
-import {DocumentsService} from '../../../documents/services/documents/documents.service';
-import {EditRequestDto} from '../../dto/requests.dtos';
-import {DocumentStatus,} from '../../../documents/documents.enum';
-import {unserialize} from 'node-serialize';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Request } from '../../../typeorm';
+import { RequestStatus } from '../../request.enums';
+import { DocumentsService } from '../../../documents/services/documents/documents.service';
+import { EditRequestDto } from '../../dto/requests.dtos';
+import { unserialize } from 'node-serialize';
 
 @Injectable()
 export class RequestsService {
@@ -57,7 +56,7 @@ export class RequestsService {
 
   async findRequestById(id: number) {
     if (!id) {
-      throw new Error('No id proviaded');
+      throw new Error('No id provided');
     }
     return await this.requestRepository.findOne({
       where: {
@@ -125,24 +124,6 @@ export class RequestsService {
       if (!request) {
         throw new Error('No request found');
       } else {
-        try {
-          for (const document of requestDto.documents) {
-            if (
-              (document.status === DocumentStatus.REJECTED ||
-                document.status === DocumentStatus.PENDING) &&
-              requestDto.status === RequestStatus.APPROVED
-            ) {
-              throw new Error(
-                'You can not approve a request with rejected documents',
-              );
-            }
-            modifiedDocuments.push(
-              await documentsService.modifyDocumentStatus(document, requestId),
-            );
-          }
-        } catch (err) {
-          throw err;
-        }
         request.status = requestDto.status;
         await this.requestRepository.save(request);
       }
@@ -156,7 +137,7 @@ export class RequestsService {
     status: RequestStatus,
   ) {
     if (!adminId || !requestId) {
-      throw new Error('No id proviaded');
+      throw new Error('No id provided');
     }
     return this.requestRepository
       .createQueryBuilder()
