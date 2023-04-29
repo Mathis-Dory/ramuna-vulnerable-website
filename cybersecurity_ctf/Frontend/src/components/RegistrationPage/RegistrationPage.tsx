@@ -51,20 +51,15 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
             getAdminStatus();
         }
         setIsSpinnerOpen(false);
-    }, []);
-
-    useEffect(() => {
-        setIsSpinnerOpen(true);
-        if (isLoggedIn() && !admin) {
-            getApplication();
-            loadCurrentUser();
-        }
-        setIsSpinnerOpen(false);
-    }, []);
+    }, [admin]);
 
     const getAdminStatus = async () => {
         const adminStatus = await isAdminRole();
         setAdmin(adminStatus);
+        if (!adminStatus) {
+            getApplication();
+            loadCurrentUser();
+        }
     };
 
     const loadCurrentUser = async () => {
@@ -178,12 +173,12 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
 
             // Loop through the PDF files
             formValues.files.pdf.slice(0, MAX_PDF_FILES).forEach((file) => {
-                formData.append('files[]', file, 'pdf');
+                formData.append('files', file, 'pdf');
             });
 
             // Loop through the image files
             formValues.files.image.slice(0, MAX_IMAGE_FILES).forEach((file) => {
-                formData.append('files[]', file, 'image');
+                formData.append('files', file, 'image');
             });
             formData.append("name", currentUser?.firstName + " " + currentUser?.lastName);
             formData.append("email", currentUser?.email || "");
