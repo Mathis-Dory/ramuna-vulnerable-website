@@ -1,11 +1,4 @@
-import {
-  ArrayMaxSize,
-  ArrayMinSize,
-  ArrayNotEmpty,
-  IsArray,
-  IsNotEmpty,
-} from 'class-validator';
-import { DocumentDto } from '../../documents/dto/documents.dtos';
+import { IsNotEmpty } from 'class-validator';
 
 export class SubmitRequestDto {
   @IsNotEmpty()
@@ -20,17 +13,5 @@ export class SubmitRequestDto {
 
 export class EditRequestDto {
   @IsNotEmpty()
-  data: any = {};
-
-  @IsNotEmpty()
   status: string;
-
-  @IsNotEmpty()
-  asigneeId: number;
-
-  @IsArray()
-  @ArrayNotEmpty()
-  @ArrayMinSize(2)
-  @ArrayMaxSize(2)
-  documents: DocumentDto[];
 }

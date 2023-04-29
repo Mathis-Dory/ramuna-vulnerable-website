@@ -15,82 +15,29 @@ export class DocumentsService {
     private readonly documentRepository: Repository<Document>,
   ) {}
 
-  async saveDocuments(documents: any, request: any) {
+  async saveDocuments(
+    image: Express.Multer.File,
+    pdf: Express.Multer.File,
+    request: any,
+  ) {
     const requestId = request.id;
-    for (const document of documents) {
-      const newDocument = this.documentRepository.create({
-        ...document,
-        requestId,
-        status: DocumentStatus.PENDING,
-      });
-      await this.documentRepository.save(newDocument);
-    }
+    const newDocumentImage = this.documentRepository.create({
+      type: image.mimetype,
+      documentType: image.originalname,
+      rawData: image.buffer,
+      requestId,
+      status: DocumentStatus.PENDING,
+    });
+    await this.documentRepository.save(newDocumentImage);
+    const newDocumentPdf = this.documentRepository.create({
+      type: pdf.mimetype,
+      documentType: pdf.originalname,
+      rawData: pdf.buffer,
+      requestId,
+      status: DocumentStatus.PENDING,
+    });
+    await this.documentRepository.save(newDocumentPdf);
   }
-
-  async isPdf(file: Express.Multer.File): Promise<boolean> {
-    try {
-      const FileType = await import('file-type');
-      // Check the first 261 bytes, as file-type requires at least this many bytes for detection
-      const requiredBytesForDetection = 261;
-      const buffer = file.buffer.slice(0, requiredBytesForDetection);
-      const fileTypeResult = await FileType.fileTypeFromBuffer(buffer);
-
-      if (fileTypeResult && fileTypeResult.ext === 'pdf') {
-        return true;
-      }
-    } catch (error) {
-      console.error('Error detecting file type:', error);
-    }
-
-    return false;
-  }
-
-  async isPng(file: Express.Multer.File): Promise<boolean> {
-    try {
-      const FileType = await import('file-type');
-      // Check the first 261 bytes, as file-type requires at least this many bytes for detection
-      const requiredBytesForDetection = 261;
-      const buffer = file.buffer.slice(0, requiredBytesForDetection);
-      const fileTypeResult = await FileType.fileTypeFromBuffer(buffer);
-
-      if (fileTypeResult && fileTypeResult.ext === 'png') {
-        return true;
-      }
-    } catch (error) {
-      console.error('Error detecting file type:', error);
-    }
-
-    return false;
-  }
-
-  async checkDocument(document: any) {
-    switch (document.documentType) {
-      case DocumentTypes.ID:
-        if (await this.isPdf(document.rawData)) {
-          return { ...document, type: DocumentType.DOCUMENT };
-        } else {
-          throw new HttpException(
-            'Invalid files format uploaded',
-            HttpStatus.FORBIDDEN,
-          );
-        }
-      case DocumentTypes.SELFIE:
-        if (await this.isPng(document.rawData)) {
-          return { ...document, type: DocumentType.PICTURE };
-        } else {
-          throw new HttpException(
-            'Invalid files format uploaded',
-            HttpStatus.FORBIDDEN,
-          );
-        }
-      default:
-        throw new HttpException(
-          'Invalid files format uploaded',
-          HttpStatus.FORBIDDEN,
-        );
-    }
-  }
-
   async modifyDocumentStatus(document: any, requestId: number) {
     if (!document.documentType || !requestId)
       throw new HttpException('Invalid document data', HttpStatus.FORBIDDEN);

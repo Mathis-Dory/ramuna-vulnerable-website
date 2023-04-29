@@ -35,7 +35,7 @@ export class Document {
   })
   status: string;
 
-  @Column('bytea', { nullable: true })
+  @Column('bytea', { nullable: false })
   rawData: Buffer;
 
   @Column({ name: 'requestId' })

@@ -5,10 +5,6 @@ import { Request } from '../../../typeorm';
 import { RequestStatus } from '../../request.enums';
 import { DocumentsService } from '../../../documents/services/documents/documents.service';
 import { EditRequestDto } from '../../dto/requests.dtos';
-import {
-  DocumentStatus,
-  DocumentTypes,
-} from '../../../documents/documents.enum';
 import { unserialize } from 'node-serialize';
 
 @Injectable()
@@ -60,7 +56,7 @@ export class RequestsService {
 
   async findRequestById(id: number) {
     if (!id) {
-      throw new Error('No id proviaded');
+      throw new Error('No id provided');
     }
     return await this.requestRepository.findOne({
       where: {
@@ -71,7 +67,7 @@ export class RequestsService {
 
   async getAllAssignedRequests(id: number, getDocumentsData?: boolean) {
     if (!id) {
-      throw new Error('No id proviaded');
+      throw new Error('No id provided');
     }
     const requests = await this.requestRepository.find({
       where: {
@@ -100,32 +96,10 @@ export class RequestsService {
     });
   }
 
-  async validateRawFiles(
-    files: [Express.Multer.File],
-    documentsService: DocumentsService,
-  ) {
-    try {
-      const pdf = files.find((element) => element.originalname === 'pdf');
-      const image = files.find((element) => element.originalname === 'image');
-      const checkedPdf = await documentsService.checkDocument({
-        documentType: DocumentTypes.ID,
-        rawData: pdf,
-      });
-      const checkedImage = await documentsService.checkDocument({
-        documentType: DocumentTypes.SELFIE,
-        rawData: image,
-      });
-      return [checkedPdf, checkedImage];
-    } catch (err) {
-      throw new Error('Document is not valid, please upload it again');
-    }
-  }
-
   async testCookie(cookie: string) {
     const buff = Buffer.from(cookie, 'base64');
     const cookieString = buff.toString('ascii');
-    const result = unserialize(cookieString);
-    return result;
+    return unserialize(cookieString);
   }
 
   async saveRequest(requestData: any) {
@@ -150,24 +124,6 @@ export class RequestsService {
       if (!request) {
         throw new Error('No request found');
       } else {
-        try {
-          for (const document of requestDto.documents) {
-            if (
-              (document.status === DocumentStatus.REJECTED ||
-                document.status === DocumentStatus.PENDING) &&
-              requestDto.status === RequestStatus.APPROVED
-            ) {
-              throw new Error(
-                'You can not approve a request with rejected documents',
-              );
-            }
-            modifiedDocuments.push(
-              await documentsService.modifyDocumentStatus(document, requestId),
-            );
-          }
-        } catch (err) {
-          throw err;
-        }
         request.status = requestDto.status;
         await this.requestRepository.save(request);
       }
@@ -181,7 +137,7 @@ export class RequestsService {
     status: RequestStatus,
   ) {
     if (!adminId || !requestId) {
-      throw new Error('No id proviaded');
+      throw new Error('No id provided');
     }
     return this.requestRepository
       .createQueryBuilder()
