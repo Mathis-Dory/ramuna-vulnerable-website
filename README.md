@@ -2,6 +2,7 @@
 Cybersecurity master 1 project University of Bucharest 2022-2023
 
 This is a vulnerable web application, your task is to find all the 6 vulnerabilities.
+For more realism we strongly encourage peoples to not take a look inside the source code, instead, pull the docker images of our different services.
 
 # How to download it
 
