@@ -1,7 +1,11 @@
 # Cybersecurity-ctf
 Cybersecurity master 1 project University of Bucharest 2022-2023
 
-This is a vulnerable web application, your task is to find all vulnerabilities.
+This is a vulnerable web application, your task is to find all the 6 vulnerabilities.
+
+# How to download it
+
+## TODO
 
 
 # Theme
