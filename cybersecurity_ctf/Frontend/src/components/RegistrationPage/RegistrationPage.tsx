@@ -6,7 +6,13 @@ import { Spinner } from "../../shared/utils/Spinner";
 import { useNavigate } from "react-router-dom";
 import { apiRequest } from "../../shared/utils/Axios";
 import { toast } from "react-toastify";
-import { getCurrentUser, isAdminRole, isLoggedIn } from "../../shared/utils/Login";
+import {
+  deleteTokens,
+  getCurrentUser,
+  isAdminRole,
+  isLoggedIn,
+  isTokenExpired,
+} from "../../shared/utils/Login";
 import { DropzoneInputProps, DropzoneRootProps, useDropzone } from "react-dropzone";
 import { User } from "../../shared/utils/Type";
 import AdminRegistrationPage from "./AdminRegistrationPage";
@@ -47,6 +53,10 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
 
   useEffect(() => {
     setIsSpinnerOpen(true);
+    if (isTokenExpired(token as string) && token !== "undefined") {
+      deleteTokens();
+      history("/");
+    }
     if (isLoggedIn()) {
       getAdminStatus();
     }
@@ -63,6 +73,7 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
   };
 
   const loadCurrentUser = async () => {
+    setIsSpinnerOpen(true);
     try {
       const response = await getCurrentUser();
       setCurrentUser(response as User);
@@ -79,10 +90,16 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
         progress: undefined,
         theme: "colored",
       });
+      setIsSpinnerOpen(false);
     }
   };
 
   const getApplication = async () => {
+    setIsSpinnerOpen(true);
+    if (isTokenExpired(token as string) && token !== "undefined") {
+      deleteTokens();
+      history("/");
+    }
     try {
       const response = await apiRequest({
         method: "GET",
@@ -95,7 +112,6 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
         setApplication(response.data as Application[]);
       }
     } catch (error: any) {
-      setIsSpinnerOpen(false);
       const errorServer = "Server error when retrieving application.";
       toast.error(errorServer, {
         position: "top-center",
@@ -107,6 +123,7 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
         progress: undefined,
         theme: "colored",
       });
+      setIsSpinnerOpen(false);
     }
   };
   const onDrop = (acceptedFiles: File[]) => {
@@ -162,6 +179,11 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
       return;
     }
     setIsSpinnerOpen(true);
+    if (isTokenExpired(token as string) && token !== "undefined") {
+      deleteTokens();
+      history("/");
+    }
+
     try {
       // Send form data to server using Axios.
       const formData = new FormData();

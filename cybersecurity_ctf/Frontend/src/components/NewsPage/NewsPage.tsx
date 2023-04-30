@@ -17,7 +17,8 @@ import {
 import { apiRequest } from "../../shared/utils/Axios";
 import { toast } from "react-toastify";
 import { Spinner } from "../../shared/utils/Spinner";
-import { isAdminRole, isLoggedIn } from "../../shared/utils/Login";
+import { deleteTokens, isAdminRole, isLoggedIn, isTokenExpired } from "../../shared/utils/Login";
+import { useNavigate } from "react-router-dom";
 
 interface NewsPageProps {}
 
@@ -47,7 +48,7 @@ const NewsPage: FC<NewsPageProps> = () => {
   const [filteredNews, setFilteredNews] = useState<GetNews[]>([]);
   const [selectedNews, setSelectedNews] = useState<GetNews | null>(null);
   const token = localStorage.getItem("token");
-
+  const history = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -72,6 +73,10 @@ const NewsPage: FC<NewsPageProps> = () => {
   }, []);
 
   useEffect(() => {
+    if (isTokenExpired(token as string) && token !== "undefined") {
+      deleteTokens();
+      history("/");
+    }
     if (isLoggedIn()) {
       getAdminStatus();
     }
@@ -100,6 +105,10 @@ const NewsPage: FC<NewsPageProps> = () => {
     setFile(null);
   };
   const handleCreatePost = async () => {
+    if (isTokenExpired(token as string) && token !== "undefined") {
+      deleteTokens();
+      history("/");
+    }
     setIsSpinnerOpen(true);
     try {
       const formData = new FormData();
@@ -150,27 +159,25 @@ const NewsPage: FC<NewsPageProps> = () => {
   };
 
   useEffect(() => {
-    setFilteredNews(news.filter((item) =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase())
-    ));
+    setFilteredNews(
+      news.filter((item) => item.title.toLowerCase().includes(searchQuery.toLowerCase())),
+    );
   }, [news, searchQuery]);
 
   const handleSelectNews = async (item: GetNews) => {
     setIsSpinnerOpen(true);
-    try{
-        const response = await apiRequest({
-            method: "GET",
-            url: `/news/id/${item.id}`,
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        setSelectedNews(response.data as GetNews);
-
-    }
-    catch (error: any) {
-        toast.error("Error getting this news. Please try again.");
+    try {
+      const response = await apiRequest({
+        method: "GET",
+        url: `/news/id/${item.id}`,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      setSelectedNews(response.data as GetNews);
+    } catch (error: any) {
+      toast.error("Error getting this news. Please try again.");
     }
     setIsSpinnerOpen(false);
   };
@@ -198,64 +205,67 @@ const NewsPage: FC<NewsPageProps> = () => {
       >
         <h1 className="text-4xl text-secondary underline">Latest news</h1>
         <div className="p-4">
-        <TextField
+          <TextField
             label="Search"
             variant="filled"
             className="bg-white p-4"
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
-        />
+          />
         </div>
         {news.length === 0 ? (
           <h2 className="p-12 text-3xl">
             Sorry, there are no news for the moment. Come back later.
           </h2>
         ) : (
-            <Grid
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: ["1fr", "1fr 1fr", "1fr 1fr 1fr"],
-                  gap: 4,
-                  justifyContent: "center",
-                }}
-            >
+          <Grid
+            sx={{
+              display: "grid",
+              gridTemplateColumns: ["1fr", "1fr 1fr", "1fr 1fr 1fr"],
+              gap: 4,
+              justifyContent: "center",
+            }}
+          >
             {filteredNews.map((item) => (
-                <div
-                    key={item.id}
-                    onClick={() => handleSelectNews(item)}
-                    className="bg-white rounded-md shadow-md cursor-pointer hover:shadow-lg m-8 p-4 hover:bg-secondary"
-                >
-                  <div className="p-2">
-                    <h5 className="text-4xl font-bold">{item.title}</h5>
-                    <p className="text-gray-500">
-                      Created on {new Date(item.created_at).toLocaleString('en-GB', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
+              <div
+                key={item.id}
+                onClick={() => handleSelectNews(item)}
+                className="m-8 cursor-pointer rounded-md bg-white p-4 shadow-md hover:bg-secondary hover:shadow-lg"
+              >
+                <div className="p-2">
+                  <h5 className="text-4xl font-bold">{item.title}</h5>
+                  <p className="text-gray-500">
+                    Created on{" "}
+                    {new Date(item.created_at).toLocaleString("en-GB", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
                     })}
-                    </p>
-                  </div>
+                  </p>
                 </div>
+              </div>
             ))}
-
           </Grid>
         )}
       </Box>
       {selectedNews && (
-          <Dialog open onClose={() => setSelectedNews(null)} sx={{ p: 4 }}>
-            <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", py: 1 }}>
-              <div className="text-4xl">
-                <div dangerouslySetInnerHTML={{ __html: selectedNews.title }} />
-              </div>
-              <IconButton aria-label="close" onClick={() => setSelectedNews(null)}>
-                <Close />
-              </IconButton>
-            </DialogTitle>
-            <Box sx={{ p: 2 }}>
-              <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
-                Created on <p>
+        <Dialog open onClose={() => setSelectedNews(null)} sx={{ p: 4 }}>
+          <DialogTitle
+            sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", py: 1 }}
+          >
+            <div className="text-4xl">
+              <div dangerouslySetInnerHTML={{ __html: selectedNews.title }} />
+            </div>
+            <IconButton aria-label="close" onClick={() => setSelectedNews(null)}>
+              <Close />
+            </IconButton>
+          </DialogTitle>
+          <Box sx={{ p: 2 }}>
+            <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
+              Created on{" "}
+              <p>
                 {new Date(selectedNews.created_at).toLocaleString("en-GB", {
                   day: "2-digit",
                   month: "2-digit",
@@ -264,22 +274,25 @@ const NewsPage: FC<NewsPageProps> = () => {
                   minute: "2-digit",
                 })}
               </p>
-              </Typography>
-              {selectedNews.binaryData && (
-                  <CardMedia
-                      component="img"
-                      height="200"
-                      image={`data:${selectedNews.binaryData.type};base64,${btoa(
-                          new Uint8Array(selectedNews.binaryData.data).reduce((data, byte) => data + String.fromCharCode(byte), "")
-                      )}`}
-                      sx={{ mb: 2 }}
-                  />
-              )}
-              <Typography variant="body1" color="text.secondary">
-                {selectedNews.body}
-              </Typography>
-            </Box>
-          </Dialog>
+            </Typography>
+            {selectedNews.binaryData && (
+              <CardMedia
+                component="img"
+                height="200"
+                image={`data:${selectedNews.binaryData.type};base64,${btoa(
+                  new Uint8Array(selectedNews.binaryData.data).reduce(
+                    (data, byte) => data + String.fromCharCode(byte),
+                    "",
+                  ),
+                )}`}
+                sx={{ mb: 2 }}
+              />
+            )}
+            <Typography variant="body1" color="text.secondary">
+              {selectedNews.body}
+            </Typography>
+          </Box>
+        </Dialog>
       )}
 
       <Dialog
