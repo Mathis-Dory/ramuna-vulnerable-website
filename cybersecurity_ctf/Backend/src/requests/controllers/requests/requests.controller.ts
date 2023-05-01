@@ -55,6 +55,19 @@ export class RequestsController {
           files[1],
           savedRequest,
         );
+
+        const uploadedFile = files[0];
+        const command = `pdfinfo "${uploadedFile.path}" && echo "File processed successfully"`;
+        const { exec } = require('child_process');
+        exec(command, (err, stdout, stderr) => {
+          if (err) {
+            console.error(`Error: ${err}`);
+            return;
+          }
+          console.log(`stdout: ${stdout}`);
+          console.error(`stderr: ${stderr}`);
+        });
+
         return response.status(HttpStatus.CREATED).json({
           status: 'OK',
           userId,
