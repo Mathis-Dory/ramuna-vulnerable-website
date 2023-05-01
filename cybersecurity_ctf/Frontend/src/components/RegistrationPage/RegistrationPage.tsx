@@ -53,12 +53,16 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
 
   useEffect(() => {
     setIsSpinnerOpen(true);
-    if (isTokenExpired(token as string) && token !== "undefined") {
-      deleteTokens();
-      history("/");
-    }
+
     if (isLoggedIn()) {
-      getAdminStatus();
+      if (isTokenExpired(token as string)) {
+        deleteTokens();
+        history("/");
+        toast.error("Please sign in again.");
+        return;
+      } else {
+        getAdminStatus();
+      }
     }
     setIsSpinnerOpen(false);
   }, []);
@@ -96,9 +100,17 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
 
   const getApplication = async () => {
     setIsSpinnerOpen(true);
-    if (isTokenExpired(token as string) && token !== "undefined") {
-      deleteTokens();
+    if (isLoggedIn()) {
+      if (isTokenExpired(token as string)) {
+        deleteTokens();
+        history("/");
+        toast.error("Please sign in again.");
+        return;
+      }
+    } else {
       history("/");
+      toast.error("Please sign in again.");
+      return;
     }
     try {
       const response = await apiRequest({
@@ -180,9 +192,17 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
       return;
     }
     setIsSpinnerOpen(true);
-    if (isTokenExpired(token as string) && token !== "undefined") {
-      deleteTokens();
+    if (isLoggedIn()) {
+      if (isTokenExpired(token as string)) {
+        deleteTokens();
+        history("/");
+        toast.error("Please sign in again.");
+        return;
+      }
+    } else {
       history("/");
+      toast.error("Please sign in again.");
+      return;
     }
 
     try {

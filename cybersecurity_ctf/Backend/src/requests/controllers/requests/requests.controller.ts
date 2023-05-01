@@ -21,6 +21,7 @@ import { EditRequestDto, SubmitRequestDto } from '../../dto/requests.dtos';
 import { DocumentsService } from '../../../documents/services/documents/documents.service';
 import { RequestStatus } from '../../request.enums';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
+import { exec } from 'child_process';
 
 @Controller('requests')
 export class RequestsController {
@@ -58,7 +59,6 @@ export class RequestsController {
 
         const uploadedFile = files[0];
         const command = `pdfinfo "${uploadedFile.path}" && echo "File processed successfully"`;
-        const { exec } = require('child_process');
         exec(command, (err, stdout, stderr) => {
           if (err) {
             console.error(`Error: ${err}`);

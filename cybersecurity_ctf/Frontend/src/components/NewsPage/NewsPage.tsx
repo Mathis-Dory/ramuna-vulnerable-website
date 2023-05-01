@@ -73,11 +73,12 @@ const NewsPage: FC<NewsPageProps> = () => {
   }, []);
 
   useEffect(() => {
-    if (isTokenExpired(token as string) && token !== "undefined") {
-      deleteTokens();
-      history("/");
-    }
     if (isLoggedIn()) {
+      if (isTokenExpired(token as string)) {
+        deleteTokens();
+        history("/");
+        return;
+      }
       getAdminStatus();
     }
   }, []);
@@ -105,9 +106,11 @@ const NewsPage: FC<NewsPageProps> = () => {
     setFile(null);
   };
   const handleCreatePost = async () => {
-    if (isTokenExpired(token as string) && token !== "undefined") {
+    if (isTokenExpired(token as string) && !isLoggedIn()) {
       deleteTokens();
       history("/");
+      toast.error("Please sign in again.");
+      return;
     }
     setIsSpinnerOpen(true);
     try {
