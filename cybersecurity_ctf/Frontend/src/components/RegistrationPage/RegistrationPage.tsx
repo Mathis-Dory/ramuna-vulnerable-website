@@ -78,7 +78,6 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
       const response = await getCurrentUser();
       setCurrentUser(response as User);
     } catch (error: any) {
-      setIsSpinnerOpen(false);
       const errorServer = "Not able to retrieve current user.";
       toast.error(errorServer, {
         position: "top-center",
@@ -90,6 +89,7 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
         progress: undefined,
         theme: "colored",
       });
+    } finally {
       setIsSpinnerOpen(false);
     }
   };
@@ -123,6 +123,7 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
         progress: undefined,
         theme: "colored",
       });
+    } finally {
       setIsSpinnerOpen(false);
     }
   };
