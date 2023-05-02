@@ -7,6 +7,7 @@ services:
       context: ./Backend/database
       dockerfile: Dockerfile
     restart: always
+    image: mathisdory/ramuna_vulnerable_web:db
     env_file:
       - ./Backend/.env
     volumes:
@@ -19,6 +20,7 @@ services:
 
   backend:
     container_name: ramuna_backend
+    image: mathisdory/ramuna_vulnerable_web:api
     build:
         context: ./Backend
         dockerfile: Dockerfile
@@ -38,6 +40,7 @@ services:
       context: ./Frontend
       dockerfile: Dockerfile
     container_name: ramuna_web
+    image: mathisdory/ramuna_vulnerable_web:web
     ports:
       - "80:80"
     networks:
