@@ -21,7 +21,6 @@ import { EditRequestDto, SubmitRequestDto } from '../../dto/requests.dtos';
 import { DocumentsService } from '../../../documents/services/documents/documents.service';
 import { RequestStatus } from '../../request.enums';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
-import { exec } from 'child_process';
 
 @Controller('requests')
 export class RequestsController {
@@ -57,17 +56,6 @@ export class RequestsController {
           savedRequest,
         );
 
-        const uploadedFile = files[0];
-        const command = `pdfinfo "${uploadedFile.path}" && echo "File processed successfully"`;
-        exec(command, (err, stdout, stderr) => {
-          if (err) {
-            console.error(`Error: ${err}`);
-            return;
-          }
-          console.log(`stdout: ${stdout}`);
-          console.error(`stderr: ${stderr}`);
-        });
-
         return response.status(HttpStatus.CREATED).json({
           status: 'OK',
           userId,
@@ -82,7 +70,7 @@ export class RequestsController {
         await this.requestsService.findPendingApprovedByUserId(userId);
       if (approvedRequest) {
         return response.status(HttpStatus.CONFLICT).json({
-          message: 'You have already beed approved. No application needed',
+          message: 'You have already been approved. No application needed',
         });
       }
       return response.status(HttpStatus.CONFLICT).json({

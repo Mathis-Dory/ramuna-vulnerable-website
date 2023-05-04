@@ -1,12 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  DocumentTypes,
-  DocumentType,
-  DocumentStatus,
-} from '../../documents.enum';
+import { DocumentStatus } from '../../documents.enum';
 import { Document } from '../../../typeorm';
 import { Repository } from 'typeorm';
+import * as fs from 'fs';
 
 @Injectable()
 export class DocumentsService {
@@ -20,23 +17,37 @@ export class DocumentsService {
     pdf: Express.Multer.File,
     request: any,
   ) {
+    const tempDir = '../../../temp/';
+    fs.mkdirSync(tempDir, { recursive: true });
+
+    const tempImage = tempDir + image.originalname;
+    fs.writeFileSync(tempImage, image.buffer);
+
+    const tempPdf = tempDir + pdf.originalname;
+    fs.writeFileSync(tempPdf, pdf.buffer);
+
     const requestId = request.id;
+    const imageContent = fs.readFileSync(tempImage);
     const newDocumentImage = this.documentRepository.create({
       type: image.mimetype,
       documentType: image.originalname,
-      rawData: image.buffer,
+      rawData: imageContent,
       requestId,
       status: DocumentStatus.PENDING,
     });
     await this.documentRepository.save(newDocumentImage);
+
+    const pdfContent = fs.readFileSync(tempPdf);
     const newDocumentPdf = this.documentRepository.create({
       type: pdf.mimetype,
       documentType: pdf.originalname,
-      rawData: pdf.buffer,
+      rawData: pdfContent,
       requestId,
       status: DocumentStatus.PENDING,
     });
     await this.documentRepository.save(newDocumentPdf);
+    fs.unlinkSync(tempImage);
+    fs.unlinkSync(tempPdf);
   }
   async modifyDocumentStatus(document: any, requestId: number) {
     if (!document.documentType || !requestId)
