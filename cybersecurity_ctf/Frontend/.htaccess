@@ -9,3 +9,5 @@
   RewriteRule . /index.html [L]
 
 </IfModule>
+
+Header add Access-Control-Allow-Origin "*"

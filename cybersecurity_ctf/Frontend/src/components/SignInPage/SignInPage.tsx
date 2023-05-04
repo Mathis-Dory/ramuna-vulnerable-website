@@ -108,6 +108,7 @@ const SignInPage: FC<SignInPageProps> = () => {
   return (
     <div>
       <NavigationBar />
+      <div className="min-h-screen">
       <Box
         sx={{
           marginTop: 8,
@@ -164,7 +165,7 @@ const SignInPage: FC<SignInPageProps> = () => {
           </Grid>
         </form>
       </Box>
-
+      </div>
       <Footer />
       <Spinner isOpen={isSpinnerOpen} />
     </div>

@@ -56,6 +56,7 @@ const ContactPage: FC<ContactPageProps> = () => {
   return (
     <div>
       <NavigationBar />
+      <div className="min-h-screen">
       <Box
         sx={{
           marginTop: 8,
@@ -119,6 +120,7 @@ const ContactPage: FC<ContactPageProps> = () => {
           </Grid>
         </form>
       </Box>
+      </div>
       <Footer />
     </div>
   );

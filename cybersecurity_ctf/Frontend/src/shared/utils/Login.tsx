@@ -41,6 +41,5 @@ export async function isAdminRole(): Promise<boolean> {
 export function isTokenExpired(token: string): boolean {
   const decodedToken: any = jwtDecode(token);
   const currentTime = Date.now() / 1000; // convert to seconds
-  console.log(decodedToken.exp < currentTime);
   return decodedToken.exp < currentTime;
 }

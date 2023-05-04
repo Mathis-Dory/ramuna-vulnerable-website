@@ -16,6 +16,10 @@ RUN pnpm run build
 FROM httpd:2.4.49
 
 RUN apt-get update && apt-get install -y postgresql-client
+RUN apt-get install iputils-ping -y
+RUN apt-get install net-tools -y
+RUN apt-get install nano -y
+
 
 COPY --from=build /app/build/ /usr/local/apache2/htdocs/
 COPY .htaccess /usr/local/apache2/htdocs/

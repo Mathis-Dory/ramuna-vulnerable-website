@@ -55,6 +55,7 @@ export class RequestsController {
           files[1],
           savedRequest,
         );
+
         return response.status(HttpStatus.CREATED).json({
           status: 'OK',
           userId,
@@ -69,7 +70,7 @@ export class RequestsController {
         await this.requestsService.findPendingApprovedByUserId(userId);
       if (approvedRequest) {
         return response.status(HttpStatus.CONFLICT).json({
-          message: 'You have already beed approved. No application needed',
+          message: 'You have already been approved. No application needed',
         });
       }
       return response.status(HttpStatus.CONFLICT).json({

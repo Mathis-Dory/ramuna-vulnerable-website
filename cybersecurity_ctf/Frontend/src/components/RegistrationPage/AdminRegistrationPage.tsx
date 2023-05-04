@@ -13,7 +13,7 @@ import {
   Button,
 } from "@mui/material";
 import { User } from "../../shared/utils/Type";
-import { deleteTokens, isTokenExpired } from "../../shared/utils/Login";
+import { deleteTokens, isLoggedIn, isTokenExpired } from "../../shared/utils/Login";
 import { useNavigate } from "react-router-dom";
 
 interface AdminRegistrationPageProps {}
@@ -57,19 +57,24 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
   const history = useNavigate();
 
   useEffect(() => {
-    if (isTokenExpired(token as string) && token !== "undefined") {
-      deleteTokens();
+    if (isLoggedIn()) {
+      if (isTokenExpired(token as string)) {
+        deleteTokens();
+        history("/");
+        toast.error("Please sign in again.");
+        return;
+      } else {
+        fetchData();
+      }
+    } else {
       history("/");
+      toast.error("Please sign in again.");
+      return;
     }
-    fetchData();
   }, []);
 
   const fetchData = async () => {
     setIsSpinnerOpen(true);
-    if (isTokenExpired(token as string) && token !== "undefined") {
-      deleteTokens();
-      history("/");
-    }
     try {
       const response = await apiRequest({
         method: "GET",
@@ -104,9 +109,17 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
 
   const getUser = async (id: string): Promise<{ email: string; user: string }> => {
     setIsSpinnerOpen(true);
-    if (isTokenExpired(token as string) && token !== "undefined") {
-      deleteTokens();
+    if (isLoggedIn()) {
+      if (isTokenExpired(token as string)) {
+        deleteTokens();
+        history("/");
+        toast.error("Please sign in again.");
+        return { email: "undefined", user: "undefined" };
+      }
+    } else {
       history("/");
+      toast.error("Please sign in again.");
+      return { email: "undefined", user: "undefined" };
     }
     try {
       const response = await apiRequest({
@@ -129,10 +142,19 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
   };
   const handleStatusChange = async (id: string, status: string) => {
     setIsSpinnerOpen(true);
-    if (isTokenExpired(token as string) && token !== "undefined") {
-      deleteTokens();
+    if (isLoggedIn()) {
+      if (isTokenExpired(token as string)) {
+        deleteTokens();
+        history("/");
+        toast.error("Please sign in again.");
+        return;
+      }
+    } else {
       history("/");
+      toast.error("Please sign in again.");
+      return;
     }
+
     try {
       await apiRequest({
         method: "PUT",
@@ -154,9 +176,17 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
 
   const handleDownload = async (id: string, type: string) => {
     setIsSpinnerOpen(true);
-    if (isTokenExpired(token as string) && token !== "undefined") {
-      deleteTokens();
+    if (isLoggedIn()) {
+      if (isTokenExpired(token as string)) {
+        deleteTokens();
+        history("/");
+        toast.error("Please sign in again.");
+        return;
+      }
+    } else {
       history("/");
+      toast.error("Please sign in again.");
+      return;
     }
     try {
       const response = await apiRequest<ArrayBuffer>({
