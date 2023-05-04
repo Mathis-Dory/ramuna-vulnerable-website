@@ -4,7 +4,6 @@ import { DocumentStatus } from '../../documents.enum';
 import { Document } from '../../../typeorm';
 import { Repository } from 'typeorm';
 import * as fs from 'fs';
-import * as path from 'path';
 
 @Injectable()
 export class DocumentsService {
