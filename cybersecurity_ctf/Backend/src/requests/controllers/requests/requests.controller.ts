@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Delete,
   HttpStatus,
   Param,
   Post,
@@ -51,8 +52,8 @@ export class RequestsController {
           userId,
         });
         await this.documentsService.saveDocuments(
-          files[0],
           files[1],
+          files[0],
           savedRequest,
         );
 
@@ -132,7 +133,7 @@ export class RequestsController {
   @Roles(Role.Admin)
   @Put('/editRequestStatus/id/:id')
   @UsePipes(ValidationPipe)
-  async editNews(
+  async editRequest(
     @Res() response,
     @Req() req,
     @Param('id') id,
@@ -176,4 +177,48 @@ export class RequestsController {
       return response.status(HttpStatus.OK).json(newRequest);
     }
   }
+
+  @Roles(Role.User)
+  @Delete('/deleteRequest/id/:id')
+  @UsePipes(ValidationPipe)
+  async removeRequest(
+      @Res() response,
+      @Req() req,
+      @Param('id') id,
+  ) {
+    const existingRequest = await this.requestsService.findRequestById(id);
+    if (!existingRequest) {
+      return response.status(HttpStatus.CONFLICT).json({
+        message: 'No such requests found in the database.',
+      });
+    } else {
+      const userId = await this.userService.getUserIdFromJwt(
+          req['headers']['authorization'],
+      );
+      if (existingRequest.userId != userId) {
+        return response.status(HttpStatus.CONFLICT).json({
+          message: 'You are not allowed to remove te request of someone else.',
+        });
+      }
+      if (
+          existingRequest.status === RequestStatus.APPROVED
+      ) {
+        return response.status(HttpStatus.CONFLICT).json({
+          message: 'This request is already approved, you can not remove it.',
+        });
+      }
+      try {
+        await this.documentsService.deleteDocuments(id);
+        const removedRequest = await this.requestsService.removeRequest(id);
+        return response.status(HttpStatus.OK).json(removedRequest);
+      } catch (error) {
+        return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+          message: 'An error occurred while deleting the request.',
+          error: error.message,
+        });
+      }
+    }
+  }
 }
+
+

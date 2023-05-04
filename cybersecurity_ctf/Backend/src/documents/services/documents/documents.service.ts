@@ -22,7 +22,7 @@ export class DocumentsService {
 
     const tempImage = tempDir + image.originalname;
     fs.writeFileSync(tempImage, image.buffer);
-
+    console.log(image.originalname);
     const tempPdf = tempDir + pdf.originalname;
     fs.writeFileSync(tempPdf, pdf.buffer);
 
@@ -46,8 +46,7 @@ export class DocumentsService {
       status: DocumentStatus.PENDING,
     });
     await this.documentRepository.save(newDocumentPdf);
-    fs.unlinkSync(tempImage);
-    fs.unlinkSync(tempPdf);
+
   }
   async modifyDocumentStatus(document: any, requestId: number) {
     if (!document.documentType || !requestId)
@@ -63,6 +62,17 @@ export class DocumentsService {
     }
     documentToUpdate.status = document.status;
     return this.documentRepository.save(documentToUpdate);
+  }
+
+  async deleteDocuments(requestId: number) {
+    const documents = await this.documentRepository.find({
+      where: { requestId },
+    });
+    const deletePromises = documents.map((document) => {
+      return this.documentRepository.delete(document);
+    });
+    await Promise.all(deletePromises);
+
   }
 
   async getDocumentById(id: number) {

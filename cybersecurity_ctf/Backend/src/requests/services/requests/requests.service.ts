@@ -149,4 +149,16 @@ export class RequestsService {
       .where('id = :id', { id: requestId })
       .execute();
   }
+
+  async removeRequest(
+      requestId: number,
+  ) {
+      const request = await this.findRequestById(requestId);
+      if (!request) {
+        throw new Error('No request found');
+      } else {
+        await this.requestRepository.remove(request);
+      }
+      return { request };
+  }
 }

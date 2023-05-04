@@ -61,14 +61,32 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
       if (isTokenExpired(token as string)) {
         deleteTokens();
         history("/");
-        toast.error("Please sign in again.");
+        toast.error("Please sign in again.", {
+          position: "top-center",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
         return;
       } else {
         fetchData();
       }
     } else {
       history("/");
-      toast.error("Please sign in again.");
+      toast.error("Please sign in again.", {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
       return;
     }
   }, []);
@@ -102,7 +120,16 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
     } catch (err) {
       console.log("error", err);
       const errorServer = "Not able to retrieve the applications of the users.";
-      toast.error(errorServer);
+      toast.error(errorServer, {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
       setIsSpinnerOpen(false);
     }
   };
@@ -113,12 +140,30 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
       if (isTokenExpired(token as string)) {
         deleteTokens();
         history("/");
-        toast.error("Please sign in again.");
+        toast.error("Please sign in again.", {
+          position: "top-center",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
         return { email: "undefined", user: "undefined" };
       }
     } else {
       history("/");
-      toast.error("Please sign in again.");
+      toast.error("Please sign in again.", {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
       return { email: "undefined", user: "undefined" };
     }
     try {
@@ -135,7 +180,16 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
     } catch (err) {
       console.log("error", err);
       const errorServer = "Not able to retrieve users";
-      toast.error(errorServer);
+      toast.error(errorServer, {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
       setIsSpinnerOpen(false);
       return { email: "undefined", user: "undefined" };
     }
@@ -146,12 +200,30 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
       if (isTokenExpired(token as string)) {
         deleteTokens();
         history("/");
-        toast.error("Please sign in again.");
+        toast.error("Please sign in again.", {
+          position: "top-center",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
         return;
       }
     } else {
       history("/");
-      toast.error("Please sign in again.");
+      toast.error("Please sign in again.", {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
       return;
     }
 
@@ -164,11 +236,29 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
       });
       window.location.reload();
       const successMessage = "The request has been updated successfully.";
-      toast.success(successMessage);
+      toast.success(successMessage, {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
     } catch (err) {
       console.log("error", err);
       const errorServer = "Not able to update this request.";
-      toast.error(errorServer);
+      toast.error(errorServer, {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
       setIsSpinnerOpen(false);
     }
     setIsSpinnerOpen(false);
@@ -180,12 +270,30 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
       if (isTokenExpired(token as string)) {
         deleteTokens();
         history("/");
-        toast.error("Please sign in again.");
+        toast.error("Please sign in again.", {
+          position: "top-center",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
         return;
       }
     } else {
       history("/");
-      toast.error("Please sign in again.");
+      toast.error("Please sign in again.", {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
       return;
     }
     try {
@@ -214,7 +322,16 @@ const AdminRegistrationPage: FC<AdminRegistrationPageProps> = () => {
       setIsSpinnerOpen(false);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to download the document");
+      toast.error("Failed to download the document", {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
       setIsSpinnerOpen(false);
     }
   };

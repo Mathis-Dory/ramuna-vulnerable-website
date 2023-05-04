@@ -24,6 +24,7 @@ const MAX_PDF_FILES = 1;
 const MAX_IMAGE_FILES = 1;
 
 interface Application {
+  id?: number;
   name: string;
   email: string;
   status?: string;
@@ -58,7 +59,16 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
       if (isTokenExpired(token as string)) {
         deleteTokens();
         history("/");
-        toast.error("Please sign in again.");
+        toast.error("Please sign in again.", {
+          position: "top-center",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
         return;
       } else {
         getAdminStatus();
@@ -104,12 +114,30 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
       if (isTokenExpired(token as string)) {
         deleteTokens();
         history("/");
-        toast.error("Please sign in again.");
+        toast.error("Please sign in again.", {
+          position: "top-center",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
         return;
       }
     } else {
       history("/");
-      toast.error("Please sign in again.");
+      toast.error("Please sign in again.", {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
       return;
     }
     try {
@@ -196,12 +224,30 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
       if (isTokenExpired(token as string)) {
         deleteTokens();
         history("/");
-        toast.error("Please sign in again.");
+        toast.error("Please sign in again.", {
+          position: "top-center",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
         return;
       }
     } else {
       history("/");
-      toast.error("Please sign in again.");
+      toast.error("Please sign in again.", {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
       return;
     }
 
@@ -250,6 +296,87 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
         progress: undefined,
         theme: "colored",
       });
+    } finally {
+      setIsSpinnerOpen(false);
+    }
+  };
+
+  const handleDeleteRequest = async () => {
+    setIsSpinnerOpen(true);
+    if (isLoggedIn()) {
+      if (isTokenExpired(token as string)) {
+        deleteTokens();
+        history("/");
+        toast.error("Please sign in again.", {
+          position: "top-center",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+        return;
+      }
+    } else {
+      history("/");
+      toast.error("Please sign in again.", {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+      return;
+    }
+    if (application === null || typeof (application) === "boolean") {
+      toast.error("No application to delete.", {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+      return;
+    }
+    try {
+      await apiRequest({
+        method: "DELETE",
+        url: `requests/deleteRequest/id/${application[0].id}`,
+        headers: {Authorization: `Bearer ${token}`},
+      });
+      setApplication(false);
+      toast.success("Your request has been deleted successfully !", {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      } );
+      window.location.reload();
+    } catch (error: any) {
+      const errorServer = "Server error when deleting application.";
+      toast.error(errorServer, {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      }
+      );
     } finally {
       setIsSpinnerOpen(false);
     }
@@ -341,11 +468,20 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
               <div className="hero-content flex-col lg:flex-row-reverse">
                 <div className="m-12 p-12">
                   <h1 className="text-5xl font-bold text-secondary">
-                    Your application is currently being processed.
+                    Your citizenship request is currently being processed.
                   </h1>
                   <p className="py-6">
-                    You will receive an email when your application is processed.
+                    You will receive an email when your request is processed.
                   </p>
+                  <p>If you want to delete your request, click on the following button.</p>
+                  <Button
+                      variant="contained"
+                      color="error"
+                      style={{ width: "150px", margin: "5px", padding: "10px" }}
+                      onClick={() => handleDeleteRequest()}
+                  >
+                    Delete
+                  </Button>
                 </div>
               </div>
             </div>
@@ -353,8 +489,16 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
             <div className="hero min-h-screen bg-primary">
               <div className="hero-content flex-col lg:flex-row-reverse">
                 <div className="m-12 p-12">
-                  <h1 className="text-5xl font-bold text-error">Your application is rejected.</h1>
-                  <p className="py-6">Contact support to try again.</p>
+                  <h1 className="text-5xl font-bold text-error">Your citizenship request is rejected.</h1>
+                  <p className="py-6">Contact support or delete your previous request by using the following button.</p>
+                  <Button
+                      variant="contained"
+                      color="error"
+                      style={{ width: "150px", margin: "5px", padding: "10px" }}
+                      onClick={() => handleDeleteRequest()}
+                  >
+                    Delete
+                  </Button>
                 </div>
               </div>
             </div>
@@ -371,7 +515,7 @@ const RegistrationPage: FC<RegistrationPageProps> = () => {
               <div className="hero-content flex-col lg:flex-row-reverse">
                 <div className="m-12 p-12">
                   <h1 className="text-5xl font-bold text-warning">
-                    Your application has unknown status.
+                    Your application has unknown status. Maybe wait a little bit and refresh the page.
                   </h1>
                 </div>
               </div>
