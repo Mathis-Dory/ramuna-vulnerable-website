@@ -25,7 +25,6 @@ import * as multer from 'multer';
     MulterModule.register({
       storage: multer.memoryStorage(),
     }),
-    // ..
     ScheduleModule.forRoot(),
     UsersModule,
     ConfigModule.forRoot({ isGlobal: true }),

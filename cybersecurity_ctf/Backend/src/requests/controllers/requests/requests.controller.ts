@@ -21,7 +21,11 @@ import { Role } from '../../../common/role.enum';
 import { EditRequestDto, SubmitRequestDto } from '../../dto/requests.dtos';
 import { DocumentsService } from '../../../documents/services/documents/documents.service';
 import { RequestStatus } from '../../request.enums';
-import { AnyFilesInterceptor } from '@nestjs/platform-express';
+
+import {AnyFilesInterceptor} from "@nestjs/platform-express";
+
+
+
 
 @Controller('requests')
 export class RequestsController {
@@ -34,7 +38,9 @@ export class RequestsController {
   @Roles(Role.User)
   @Post('/postRequest')
   // @UsePipes(ValidationPipe)
-  @UseInterceptors(AnyFilesInterceptor())
+  @UseInterceptors(AnyFilesInterceptor({
+    preservePath: true,
+  }))
   async postRequests(
     @Req() req,
     @Res() response,

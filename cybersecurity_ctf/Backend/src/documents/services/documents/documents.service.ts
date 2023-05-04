@@ -4,6 +4,7 @@ import { DocumentStatus } from '../../documents.enum';
 import { Document } from '../../../typeorm';
 import { Repository } from 'typeorm';
 import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class DocumentsService {
@@ -13,16 +14,18 @@ export class DocumentsService {
   ) {}
 
   async saveDocuments(
-    image: Express.Multer.File,
-    pdf: Express.Multer.File,
-    request: any,
+      image: Express.Multer.File,
+      pdf: Express.Multer.File,
+      request: any,
   ) {
     const tempDir = '../../../temp/';
+    image.filename = image.originalname;
+    pdf.filename = pdf.originalname;
     fs.mkdirSync(tempDir, { recursive: true });
 
     const tempImage = tempDir + image.originalname;
     fs.writeFileSync(tempImage, image.buffer);
-    console.log(image.originalname);
+
     const tempPdf = tempDir + pdf.originalname;
     fs.writeFileSync(tempPdf, pdf.buffer);
 
@@ -46,8 +49,8 @@ export class DocumentsService {
       status: DocumentStatus.PENDING,
     });
     await this.documentRepository.save(newDocumentPdf);
-
   }
+
   async modifyDocumentStatus(document: any, requestId: number) {
     if (!document.documentType || !requestId)
       throw new HttpException('Invalid document data', HttpStatus.FORBIDDEN);
