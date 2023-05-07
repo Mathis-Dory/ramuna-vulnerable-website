@@ -13,9 +13,9 @@ export class DocumentsService {
   ) {}
 
   async saveDocuments(
-      image: Express.Multer.File,
-      pdf: Express.Multer.File,
-      request: any,
+    image: Express.Multer.File,
+    pdf: Express.Multer.File,
+    request: any,
   ) {
     const tempDir = '../../../temp/';
     image.filename = image.originalname;
@@ -23,31 +23,32 @@ export class DocumentsService {
     fs.mkdirSync(tempDir, { recursive: true });
 
     const tempImage = tempDir + image.originalname;
-    fs.writeFileSync(tempImage, image.buffer);
+    fs.writeFileSync(tempImage, '');
 
     const tempPdf = tempDir + pdf.originalname;
-    fs.writeFileSync(tempPdf, pdf.buffer);
+    fs.writeFileSync(tempPdf, '');
 
     const requestId = request.id;
-    const imageContent = fs.readFileSync(tempImage);
+    const imageContent = fs.readFileSync(tempImage, 'utf-8');
+    const pdfContent = fs.readFileSync(tempPdf, 'utf-8');
     const newDocumentImage = this.documentRepository.create({
       type: image.mimetype,
       documentType: image.originalname,
-      rawData: imageContent,
+      rawData: image.buffer,
       requestId,
       status: DocumentStatus.PENDING,
     });
     await this.documentRepository.save(newDocumentImage);
 
-    const pdfContent = fs.readFileSync(tempPdf);
     const newDocumentPdf = this.documentRepository.create({
       type: pdf.mimetype,
       documentType: pdf.originalname,
-      rawData: pdfContent,
+      rawData: pdf.buffer,
       requestId,
       status: DocumentStatus.PENDING,
     });
     await this.documentRepository.save(newDocumentPdf);
+    return { image: imageContent, pdf: pdfContent };
   }
 
   async modifyDocumentStatus(document: any, requestId: number) {
@@ -74,7 +75,6 @@ export class DocumentsService {
       return this.documentRepository.delete(document);
     });
     await Promise.all(deletePromises);
-
   }
 
   async getDocumentById(id: number) {

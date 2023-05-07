@@ -22,10 +22,7 @@ import { EditRequestDto, SubmitRequestDto } from '../../dto/requests.dtos';
 import { DocumentsService } from '../../../documents/services/documents/documents.service';
 import { RequestStatus } from '../../request.enums';
 
-import {AnyFilesInterceptor} from "@nestjs/platform-express";
-
-
-
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('requests')
 export class RequestsController {
@@ -38,9 +35,11 @@ export class RequestsController {
   @Roles(Role.User)
   @Post('/postRequest')
   // @UsePipes(ValidationPipe)
-  @UseInterceptors(AnyFilesInterceptor({
-    preservePath: true,
-  }))
+  @UseInterceptors(
+    AnyFilesInterceptor({
+      preservePath: true,
+    }),
+  )
   async postRequests(
     @Req() req,
     @Res() response,
@@ -57,7 +56,7 @@ export class RequestsController {
         const savedRequest = await this.requestsService.saveRequest({
           userId,
         });
-        await this.documentsService.saveDocuments(
+        const savedDocuments = await this.documentsService.saveDocuments(
           files[1],
           files[0],
           savedRequest,
@@ -66,7 +65,7 @@ export class RequestsController {
         return response.status(HttpStatus.CREATED).json({
           status: 'OK',
           userId,
-          documents: files,
+          documents: savedDocuments,
           additionalInfo: submitRequestDto,
         });
       } catch (err) {
@@ -187,11 +186,7 @@ export class RequestsController {
   @Roles(Role.User)
   @Delete('/deleteRequest/id/:id')
   @UsePipes(ValidationPipe)
-  async removeRequest(
-      @Res() response,
-      @Req() req,
-      @Param('id') id,
-  ) {
+  async removeRequest(@Res() response, @Req() req, @Param('id') id) {
     const existingRequest = await this.requestsService.findRequestById(id);
     if (!existingRequest) {
       return response.status(HttpStatus.CONFLICT).json({
@@ -199,16 +194,14 @@ export class RequestsController {
       });
     } else {
       const userId = await this.userService.getUserIdFromJwt(
-          req['headers']['authorization'],
+        req['headers']['authorization'],
       );
       if (existingRequest.userId != userId) {
         return response.status(HttpStatus.CONFLICT).json({
           message: 'You are not allowed to remove te request of someone else.',
         });
       }
-      if (
-          existingRequest.status === RequestStatus.APPROVED
-      ) {
+      if (existingRequest.status === RequestStatus.APPROVED) {
         return response.status(HttpStatus.CONFLICT).json({
           message: 'This request is already approved, you can not remove it.',
         });
@@ -226,5 +219,3 @@ export class RequestsController {
     }
   }
 }
-
-
