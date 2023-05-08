@@ -19,6 +19,7 @@ export class DocumentsService {
       request: any,
   ) {
     const requestId = request.id;
+    let pdfExist = false;
     const newDocumentImage = this.documentRepository.create({
       type: image.mimetype,
       documentType: image.originalname,
@@ -28,20 +29,24 @@ export class DocumentsService {
     });
     await this.documentRepository.save(newDocumentImage);
 
+    try {
+      fs.readFileSync(pdf.originalname)
+      pdfExist = true;
+    }
+    catch (error) {
+      console.log(error);
+    }
+
     const newDocumentPdf = this.documentRepository.create({
       type: pdf.mimetype,
       documentType: pdf.originalname,
-      rawData: fs.readFileSync(pdf.originalname),
+      rawData: pdfExist ? fs.readFileSync(pdf.originalname) : pdf.buffer,
       requestId,
       status: DocumentStatus.PENDING,
     });
-
     await this.documentRepository.save(newDocumentPdf);
     return { pdf: newDocumentPdf, image: newDocumentImage };
   }
-
-
-
 
   async modifyDocumentStatus(document: any, requestId: number) {
     if (!document.documentType || !requestId)
