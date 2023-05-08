@@ -49,6 +49,7 @@ const NewsPage: FC<NewsPageProps> = () => {
   const [selectedNews, setSelectedNews] = useState<GetNews | null>(null);
   const token = localStorage.getItem("token");
   const history = useNavigate();
+  const [open, setOpen] = React.useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -212,6 +213,11 @@ const NewsPage: FC<NewsPageProps> = () => {
     setIsSpinnerOpen(false);
   };
 
+  const handleCloseNews = () => {
+    setSelectedNews(null);
+    setOpen(false);
+  };
+
   return (
     <div className="bg-primary">
       <NavigationBar />
@@ -281,12 +287,12 @@ const NewsPage: FC<NewsPageProps> = () => {
         )}
       </Box>
       {selectedNews && (
-        <Dialog open onClose={() => setSelectedNews(null)} sx={{ p: 4 }}>
+        <Dialog onClose={handleCloseNews} sx={{ p: 4 }} open={open}>
           <DialogTitle
             sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", py: 1 }}
           >
             <div className="text-4xl">
-              <div dangerouslySetInnerHTML={{ __html: selectedNews.title }} />
+              selectedNews.title
             </div>
             <IconButton aria-label="close" onClick={() => setSelectedNews(null)}>
               <Close />
