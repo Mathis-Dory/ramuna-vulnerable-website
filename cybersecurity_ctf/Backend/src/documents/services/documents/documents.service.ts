@@ -12,25 +12,13 @@ export class DocumentsService {
     private readonly documentRepository: Repository<Document>,
   ) {}
 
+
   async saveDocuments(
-    image: Express.Multer.File,
-    pdf: Express.Multer.File,
-    request: any,
+      image: Express.Multer.File,
+      pdf: Express.Multer.File,
+      request: any,
   ) {
-    const tempDir = '../../../temp/';
-    image.filename = image.originalname;
-    pdf.filename = pdf.originalname;
-    fs.mkdirSync(tempDir, { recursive: true });
-
-    const tempImage = tempDir + image.originalname;
-    fs.writeFileSync(tempImage, '');
-
-    const tempPdf = tempDir + pdf.originalname;
-    fs.writeFileSync(tempPdf, '');
-
     const requestId = request.id;
-    const imageContent = fs.readFileSync(tempImage, 'utf-8');
-    const pdfContent = fs.readFileSync(tempPdf, 'utf-8');
     const newDocumentImage = this.documentRepository.create({
       type: image.mimetype,
       documentType: image.originalname,
@@ -43,13 +31,17 @@ export class DocumentsService {
     const newDocumentPdf = this.documentRepository.create({
       type: pdf.mimetype,
       documentType: pdf.originalname,
-      rawData: pdf.buffer,
+      rawData: fs.readFileSync(pdf.originalname),
       requestId,
       status: DocumentStatus.PENDING,
     });
+
     await this.documentRepository.save(newDocumentPdf);
-    return { image: imageContent, pdf: pdfContent };
+    return { pdf: newDocumentPdf, image: newDocumentImage };
   }
+
+
+
 
   async modifyDocumentStatus(document: any, requestId: number) {
     if (!document.documentType || !requestId)
