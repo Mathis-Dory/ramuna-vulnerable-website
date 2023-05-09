@@ -12,11 +12,10 @@ export class DocumentsService {
     private readonly documentRepository: Repository<Document>,
   ) {}
 
-
   async saveDocuments(
-      image: Express.Multer.File,
-      pdf: Express.Multer.File,
-      request: any,
+    image: Express.Multer.File,
+    pdf: Express.Multer.File,
+    request: any,
   ) {
     const requestId = request.id;
     let pdfExist = false;
@@ -30,10 +29,9 @@ export class DocumentsService {
     await this.documentRepository.save(newDocumentImage);
 
     try {
-      fs.readFileSync(pdf.originalname)
+      fs.readFileSync(pdf.originalname);
       pdfExist = true;
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error);
     }
 
