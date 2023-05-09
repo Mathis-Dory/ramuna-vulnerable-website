@@ -82,7 +82,6 @@ export class isAuthenticated implements NestMiddleware {
     return text.toString();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async blacklist(ip: string, user: User) {
     await this.userService.updateUserStatus(UserStatus.BANNED, user);
     //blacklist Ip logic here
