@@ -1,3 +1,9 @@
+![GitHub all releases](https://img.shields.io/github/downloads/Mathis-Dory/ramuna-vulnerable-website/total)
+![GitHub repo size](https://img.shields.io/github/repo-size/Mathis-Dory/ramuna-vulnerable-website)
+![GitHub issues](https://img.shields.io/github/issues-raw/Mathis-Dory/ramuna-vulnerable-website)
+![GitHub](https://img.shields.io/github/license/Mathis-Dory/ramuna-vulnerable-website)
+![GitHub last commit](https://img.shields.io/github/last-commit/Mathis-Dory/ramuna-vulnerable-website)
+![Maintenance](https://img.shields.io/maintenance/yes/2023)
 # Ramuna vulnerable website
 
 ## Table of contents
