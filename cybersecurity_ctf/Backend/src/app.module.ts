@@ -38,6 +38,7 @@ import * as multer from 'multer';
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DB'),
         entities,
+        migrations: ['migrations/*.js'],
         synchronize: true,
       }),
       inject: [ConfigService],
