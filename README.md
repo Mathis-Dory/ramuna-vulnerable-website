@@ -10,7 +10,7 @@
 
 ## Presentation of the project
 
-This is a project for the cyber security course at the University of Bucharest. The goal is to create a vulnerable web application in order to create a CTF (Capture The Flag) for the students.
+This is a project for the cybersecurity course at the University of Bucharest. The goal is to create a vulnerable web application in order to create a CTF (Capture The Flag) for the students.
 This application is a fictitious representation of a government website where citizens can consult the different news and applications to obtain the citizenship of the country.
 
 
@@ -19,6 +19,7 @@ This application is a fictitious representation of a government website where ci
 This is a vulnerable web application, your task is to find all the 6 vulnerabilities.
 The next version of the application will contain a new page were you will be able to report the flags you found (there are no flag in the current version).
 For more realism we strongly encourage peoples to not take a look inside the source code of the application.
+The vulnerabilities can be web vulnerabilities, server vulnerabilities or even forensic.
 
 ### How to download it
 
