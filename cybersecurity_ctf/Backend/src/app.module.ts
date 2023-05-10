@@ -74,6 +74,7 @@ export class AppModule implements NestModule {
         { path: 'users/signUp', method: RequestMethod.POST },
         { path: 'news/allNews', method: RequestMethod.GET },
         { path: 'requests/internal/test', method: RequestMethod.GET },
+        { path: 'news/id/:id', method: RequestMethod.GET },
       )
       .forRoutes({ path: '*', method: RequestMethod.ALL });
   }
