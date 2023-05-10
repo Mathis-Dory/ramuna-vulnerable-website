@@ -1,32 +1,41 @@
-# ramuna-vulnerable-website
-Cybersecurity master 1 project University of Bucharest 2022-2023
+# Ramuna vulnerable website
+
+## Table of contents
+  - [Presentation of the project](#presentation-of-the-project)
+    - [What is the goal ?](#what-is-the-goal-)
+    - [How to download it](#how-to-download-it)
+  - [Contributing](#contributing)
+    - [Commit rules:](#commit-rules)
+    - [Tips](#tips)
+
+## Presentation of the project
+
+This is a project for the cybersecurity course at the University of Bucharest. The goal is to create a vulnerable web application in order to create a CTF (Capture The Flag) for the students.
+This application is a fictitious representation of a government website where citizens can consult the different news and applications to obtain the citizenship of the country.
+
+
+### What is the goal ?
 
 This is a vulnerable web application, your task is to find all the 6 vulnerabilities.
-For more realism we strongly encourage peoples to not take a look inside the source code, instead, pull the docker images of our different services and consider you can not access the containers (see below).
+The next version of the application will contain a new page were you will be able to report the flags you found (there are no flag in the current version).
+For more realism we strongly encourage peoples to not take a look inside the source code of the application.
+The vulnerabilities can be web vulnerabilities, server vulnerabilities or even forensic.
 
-# How to download it
+### How to download it
 
-- WARNING: If you want to use a virtual machine such as Kali in order to test the application, you will need to install docker on the virtual machine. The reason is the following, we can not access containers running on the host from a VM.
+- Clone the repository ```git clone https://github.com/Mathis-Dory/ramuna-vulnerable-website.git```
+- Install Docker and Docker-compose on your machine.
+- Go to the root of the project and run ```docker-compose up --build -d```
+- Go to ```localhost:80``` on your favorite internet browser, you should see the application.
+- If you are using a virtual machine such as Kali Linux, you will need to change the ```localhost``` to the ip of your host machine.
 
-### Installing the project on a Kali VM
+## Contributing
 
-- Step 1: Open a terminal.
-- Step 2: Check for updates: ```sudo apt update``` and ```sudo apt upgrade```.
-- Step 3: Install docker: ```sudo apt install docker.io```.
-- step 4 : Install docker-compose: ```sudo apt install docker-compose```.
-- Step 5: Clone the project: ```git clone https://github.com/Mathis-Dory/ramuna-vulnerable-website.git```.
-- Step 6: Go to the project folder: ```cd ramuna-vulnerable-website/cybersecurity_ctf```.
-- Step 7: Run the following command: ```sudo docker-compose up -d```.
-- step 8: You should be able to access the application on your browser at the following address: ```http://localhost```.
-
-# Theme
-This application is a fictitious representation of a government website where citizens can consult the different news and applications to obtain citizenship
-
-
-# Commit rules:
+### Commit rules:
 
 - Please use conventional commit
-- Use your own branch for your feature, in order to do that create a card in the board, next go to issues next create a developpement branch.
+- Use Pull request
+- Use your own branch for your feature, in order to do that create a card in the board, next go to issues next create a development branch.
 - Rebase your branch as much as possible:
   - Checkout master
   - Pull master
@@ -35,8 +44,8 @@ This application is a fictitious representation of a government website where ci
   - Sometimes you will need to push force
 - Do not push on master 
 
-# Tips
+### Tips
 
 - Use prettier plugin for your IDE so your code stay clean.
-- Use Conventionnal commit plugin and use it to commit.
+- Use Conventional commit plugin and use it to commit.
 - This project use pnpm instead of npm so install it.

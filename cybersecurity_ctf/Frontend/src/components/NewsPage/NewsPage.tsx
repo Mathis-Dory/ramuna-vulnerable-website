@@ -65,7 +65,16 @@ const NewsPage: FC<NewsPageProps> = () => {
         if (error.data.message === "No news found in the database.") {
           setNews([]);
         } else {
-          toast.error("Error getting news. Please try again.");
+          toast.error("Error getting news. Please try again.", {
+            position: "top-center",
+            autoClose: 4000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+          });
         }
       }
     };
@@ -109,7 +118,16 @@ const NewsPage: FC<NewsPageProps> = () => {
     if (isTokenExpired(token as string) && !isLoggedIn()) {
       deleteTokens();
       history("/");
-      toast.error("Please sign in again.");
+      toast.error("Please sign in again.", {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
       return;
     }
     setIsSpinnerOpen(true);
@@ -180,7 +198,16 @@ const NewsPage: FC<NewsPageProps> = () => {
       });
       setSelectedNews(response.data as GetNews);
     } catch (error: any) {
-      toast.error("Error getting this news. Please try again.");
+      toast.error("Error getting this news. Please try again.", {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
     }
     setIsSpinnerOpen(false);
   };
@@ -259,7 +286,7 @@ const NewsPage: FC<NewsPageProps> = () => {
             sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", py: 1 }}
           >
             <div className="text-4xl">
-              <div dangerouslySetInnerHTML={{ __html: selectedNews.title }} />
+              <div dangerouslySetInnerHTML={{__html: selectedNews.title}} />
             </div>
             <IconButton aria-label="close" onClick={() => setSelectedNews(null)}>
               <Close />

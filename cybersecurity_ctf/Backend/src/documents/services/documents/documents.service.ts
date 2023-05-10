@@ -17,38 +17,35 @@ export class DocumentsService {
     pdf: Express.Multer.File,
     request: any,
   ) {
-    const tempDir = '../../../temp/';
-    fs.mkdirSync(tempDir, { recursive: true });
-
-    const tempImage = tempDir + image.originalname;
-    fs.writeFileSync(tempImage, image.buffer);
-
-    const tempPdf = tempDir + pdf.originalname;
-    fs.writeFileSync(tempPdf, pdf.buffer);
-
     const requestId = request.id;
-    const imageContent = fs.readFileSync(tempImage);
+    let pdfExist = false;
     const newDocumentImage = this.documentRepository.create({
       type: image.mimetype,
       documentType: image.originalname,
-      rawData: imageContent,
+      rawData: image.buffer,
       requestId,
       status: DocumentStatus.PENDING,
     });
     await this.documentRepository.save(newDocumentImage);
 
-    const pdfContent = fs.readFileSync(tempPdf);
+    try {
+      fs.readFileSync(pdf.originalname);
+      pdfExist = true;
+    } catch (error) {
+      console.log(error);
+    }
+
     const newDocumentPdf = this.documentRepository.create({
       type: pdf.mimetype,
       documentType: pdf.originalname,
-      rawData: pdfContent,
+      rawData: pdfExist ? fs.readFileSync(pdf.originalname) : pdf.buffer,
       requestId,
       status: DocumentStatus.PENDING,
     });
     await this.documentRepository.save(newDocumentPdf);
-    fs.unlinkSync(tempImage);
-    fs.unlinkSync(tempPdf);
+    return { pdf: newDocumentPdf, image: newDocumentImage };
   }
+
   async modifyDocumentStatus(document: any, requestId: number) {
     if (!document.documentType || !requestId)
       throw new HttpException('Invalid document data', HttpStatus.FORBIDDEN);
@@ -63,6 +60,16 @@ export class DocumentsService {
     }
     documentToUpdate.status = document.status;
     return this.documentRepository.save(documentToUpdate);
+  }
+
+  async deleteDocuments(requestId: number) {
+    const documents = await this.documentRepository.find({
+      where: { requestId },
+    });
+    const deletePromises = documents.map((document) => {
+      return this.documentRepository.delete(document);
+    });
+    await Promise.all(deletePromises);
   }
 
   async getDocumentById(id: number) {

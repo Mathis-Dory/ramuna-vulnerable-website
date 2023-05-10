@@ -1,8 +1,8 @@
 {
-  "name": "backend",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "name": "ramnuna-backend",
+  "version": "1.0.0",
+  "description": "NestJS backend for the vulnerable web application Ramuna",
+  "author": "Mathis Dory, Stefanita Secioreanu",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {

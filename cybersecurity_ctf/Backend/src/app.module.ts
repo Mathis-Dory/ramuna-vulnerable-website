@@ -25,7 +25,6 @@ import * as multer from 'multer';
     MulterModule.register({
       storage: multer.memoryStorage(),
     }),
-    // ..
     ScheduleModule.forRoot(),
     UsersModule,
     ConfigModule.forRoot({ isGlobal: true }),
@@ -39,6 +38,7 @@ import * as multer from 'multer';
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DB'),
         entities,
+        migrations: ['migrations/*.js'],
         synchronize: true,
       }),
       inject: [ConfigService],
@@ -74,6 +74,7 @@ export class AppModule implements NestModule {
         { path: 'users/signUp', method: RequestMethod.POST },
         { path: 'news/allNews', method: RequestMethod.GET },
         { path: 'requests/internal/test', method: RequestMethod.GET },
+        { path: 'news/id/:id', method: RequestMethod.GET },
       )
       .forRoutes({ path: '*', method: RequestMethod.ALL });
   }
