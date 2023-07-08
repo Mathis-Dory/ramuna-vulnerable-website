@@ -22,7 +22,7 @@ This application is a fictitious representation of a government website where ci
 
 ### What is the goal ?
 
-This is a vulnerable web application, your task is to find all the 6 vulnerabilities.
+This is a vulnerable web application, your task is to find all the 7 vulnerabilities.
 The next version of the application will contain a new page were you will be able to report the flags you found (there are no flag in the current version).
 For more realism we strongly encourage peoples to not take a look inside the source code of the application.
 The vulnerabilities can be web vulnerabilities, server vulnerabilities or even forensic.
